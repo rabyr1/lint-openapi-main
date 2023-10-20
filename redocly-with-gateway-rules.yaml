@@ -1,0 +1,136 @@
+plugins:
+  - './custom-rules-plugin.js'
+extends:
+  - recommended
+rules:
+  security-defined: warn
+
+  info-contact: error
+
+  operation-4xx-problem-details-rfc7807: warn
+
+  assert/openapi-version-3xx:
+    subject:
+      type: Root
+      property:
+        - openapi
+    message: Every specification must have an `openapi` property. Minimum `openapi` version must be 3xx.
+    assertions:
+      defined: true
+
+  assert/info-description:
+    subject:
+      type: Info
+      property: description
+    message: Info object must contain a `description` property which has minimum of 30 chars length.
+    assertions:
+      defined: true
+      minLength: 30
+
+  assert/info-contact-email:
+    subject:
+      type: Contact
+      property: email
+    message: Contact email should always be provided.
+    assertions:
+      defined: true
+
+  assert/request-media-type-map-application-json:
+    where:
+      - subject:
+          type: Operation
+        assertions:
+          defined: true
+      - subject:
+          type: RequestBody
+        assertions:
+          defined: true
+    subject:
+      type: MediaTypesMap
+    severity: warn
+    message: Only application/json should be used in the requests.
+    assertions:
+      const: application/json
+
+  assert/response-media-type-map-application-json:
+    where:
+      - subject:
+          type: Operation
+        assertions:
+          defined: true
+      - subject:
+          type: Response
+          matchParentKeys: /2[Xx0-9]{2}/
+        assertions:
+          defined: true
+    subject:
+      type: MediaTypesMap
+    severity: warn
+    message: Only application/json should be used in 2xx responses.
+    assertions:
+      const: application/json
+
+  assert/no-verbs-in-path:
+    subject:
+      type: Paths
+    severity: warn
+    assertions:
+      custom/checkIfPathsContainVerbs:
+        verbs:
+          - create
+          - retrieve
+          - merge
+          - delete
+          - list
+          - upsert
+          - update
+          - approve
+          - reject
+          - edit
+          - remove
+          - set
+          - add
+
+  assert/sever-description-contains-keywords:
+    subject:
+      type: Server
+      property: description
+    severity: error
+    assertions:
+      custom/checkIfServerDescriptionContainsKeywords:
+        keywords:
+          - PROD
+          - STAGE
+          - TEST
+          - DEV
+
+  assert/base-path-has-valid-format:
+    subject:
+      type: Server
+      property: url
+    severity: error
+    assertions:
+      custom/basePathHasValidFormat:
+
+  assert/base-path-has-valid-name:
+    subject:
+      type: Server
+      property: url
+    severity: error
+    assertions:
+      custom/basePathHasValidName:
+
+  assert/resource-path-has-valid-format:
+    subject:
+      type: Paths
+    severity: error
+    assertions:
+      custom/resourcePathHasValidFormat:
+
+  assert/title-has-valid-format:
+    subject:
+      type: Info
+      property: title
+    severity: error
+    assertions:
+      custom/titleHasValidFormat:

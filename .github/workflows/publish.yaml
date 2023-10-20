@@ -1,0 +1,46 @@
+name: Publish @ingka-group-digital/lint-openapi
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'lib/**'
+      - 'custom-rules-plugin.js'
+      - 'redocly.yaml'
+      - 'redocly-with-gateway-rules.yaml'
+
+env:
+  MAIN_BRANCH: 'refs/heads/main'
+
+jobs:
+  build-and-publish-package:
+    name: Build and publish package artifacts
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Use the node_modules cache if available
+        uses: actions/cache@v3
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ steps.versions.outputs.node_version }}-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-${{ steps.versions.outputs.node_version }}-
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Set default registry
+        run: npm config set registry https://artifactory.build.ingka.ikea.com/artifactory/api/npm/ingka-npm-shared-local
+
+      - name: Auth with Artifactory
+        run:
+          curl -u ${{ secrets.ARTIFACTORY_USERNAME }}:${{ secrets.ARTIFACTORY_API_KEY }}
+          https://artifactory.build.ingka.ikea.com/artifactory/api/npm/auth >> .npmrc
+
+      - name: Fix auth configuration
+        run: npm config fix
+
+      - name: Publish package
+        if: ${{ github.ref == env.MAIN_BRANCH }}
+        run: npm publish

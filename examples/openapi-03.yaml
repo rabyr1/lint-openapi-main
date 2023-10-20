@@ -1,0 +1,735 @@
+openapi: 3.0.3
+
+info:
+  description: Settlement Shipment API is used to fetch Shipment details in Settlement app.
+  version: 1.2.2
+  title: Settlement Shipment API
+  contact:
+    name: Team SETT, Delivery and Services
+    email: dl.dsm.eventmanagement.nl@ingka.com
+servers:
+  - url: https://api.ingka.com/settlements/shipments-service
+    description: API Gateway PROD
+  - url: https://api.ingka.ppe.ikeadt.com/settlements/shipments-service
+    description: API Gateway STAGE
+
+paths:
+  /shipments:
+    get:
+      tags:
+        - Shipment
+      summary: Fetches list of shipments.
+      operationId: getShipments
+      description: Fetches pageable, filterable list of Shipments.
+      parameters:
+        - in: query
+          name: page
+          description: page number that has to be returned
+          required: false
+          schema:
+            type: integer
+        - in: query
+          name: size
+          description: the size of the page that has to be returned
+          required: false
+          schema:
+            type: integer
+        - in: query
+          name: sort
+          description: sorting fields specification
+          required: false
+          schema:
+            type: string
+            enum:
+              [
+                id,
+                externalId,
+                serviceProviderExternalId,
+                senderExternalId,
+                plannedStartTime,
+                plannedEndTime,
+                plannedDistance,
+                effectiveRate,
+                createdAt,
+              ]
+        - in: query
+          name: serviceProviderId
+          deprecated: true
+          description: the external service provider id by which shipments must be filtered
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: periodTo
+          deprecated: true
+          description: the date which filters shipments so that plannedEndTime of the shipment is before it
+          required: false
+          schema:
+            type: string
+            format: date-time
+        - in: query
+          name: periodFrom
+          deprecated: true
+          description: the date which filters shipments so that plannedEndTime of the shipment is after it
+          required: false
+          schema:
+            type: string
+            format: date-time
+        - in: query
+          name: externalId
+          description: the external shipment id by which shipments must be filtered
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: senderExternalId
+          description: the external sender id by which shipments must be filtered
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: serviceProviderExternalId
+          description: the external service provider id by which shipments must be filtered
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: plannedStartTimeRangeFrom
+          description: the date which filters shipments so that plannedStartTime of the shipment is after or equal to it
+          required: false
+          schema:
+            type: string
+            format: date-time
+        - in: query
+          name: plannedStartTimeRangeTo
+          description:
+            the date which filters shipments so that plannedStartTime of the shipment is before or equal to it
+          required: false
+          schema:
+            type: string
+            format: date-time
+        - in: query
+          name: plannedEndTimeRangeFrom
+          description: the date which filters shipments so that plannedEndTime of the shipment is after or equal to it
+          required: false
+          schema:
+            type: string
+            format: date-time
+        - in: query
+          name: plannedEndTimeRangeTo
+          description: the date which filters shipments so that plannedEndTime of the shipment is before or equal to it
+          required: false
+          schema:
+            type: string
+            format: date-time
+        - in: query
+          name: plannedDistanceRangeFrom
+          description:
+            the plannedDistance of the shipment so that plannedDistance of the shipment is after or equal to it
+          required: false
+          schema:
+            type: number
+            format: double
+        - in: query
+          name: plannedDistanceRangeTo
+          description:
+            the plannedDistance of the shipment so that plannedDistance of the shipment is before or equal to it
+          required: false
+          schema:
+            type: number
+            format: double
+        - in: query
+          name: effectiveRateRangeFrom
+          description: the effectiveRate of the shipment so that plannedDistance of the shipment is after or equal to it
+          required: false
+          schema:
+            type: number
+            format: double
+        - in: query
+          name: effectiveRateRangeTo
+          description:
+            the effectiveRate of the shipment so that plannedDistance of the shipment is before or equal to it
+          required: false
+          schema:
+            type: number
+            format: double
+        - in: query
+          name: load
+          description: comma separated list of non-attributes to bring in response.
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: list of shipments
+          content:
+            application/sett.active-shipment.v1+json:
+              schema:
+                $ref: '#/components/schemas/ShipmentsList'
+            application/sett.active-shipment.v2+json:
+              schema:
+                $ref: '#/components/schemas/PaginatedShipments'
+            multipart/form-data;type=text/csv:
+              schema:
+                $ref: '#/components/schemas/PaginatedShipments'
+        '400':
+          description: bad input parameter
+  /shipment:
+    post:
+      tags:
+        - Shipment
+      summary: Creates a shipment.
+      description: Create a shipment.
+      operationId: createShipment
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateShipmentDto'
+      responses:
+        '201':
+          description: shipment create request accepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ShipmentDetailsDto'
+        '400':
+          description: bad input parameter
+        '409':
+          description: shipment with this externalId already persisted
+    get:
+      tags:
+        - Shipment
+      summary: Fetches shipment info by its externalId and externalSystem.
+      operationId: getShipmentByExternalIdAndSystem
+      description: Fetches shipment info including its work orders based on the provided externalId and externalSystem.
+      parameters:
+        - in: query
+          name: externalId
+          description: shipment externalId for which shipment details details need to be fetched.
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: externalSystem
+          description: shipment externalSystem for which shipment details details need to be fetched.
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Shipment Object including its work orders.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ShipmentDetailsDto'
+        '400':
+          description: bad input parameter
+
+  /shipment/{id}:
+    get:
+      tags:
+        - Shipment
+      summary: Fetches shipment info by its internal id.
+      operationId: getShipmentById
+      description: Fetches shipment info including its work orders based on the provided shipment id.
+      parameters:
+        - in: path
+          name: id
+          description: shipment id for which shipment details details need to be fetched.
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Shipment Object including its work orders.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ShipmentDetailsDto'
+        '400':
+          description: bad input parameter
+
+  /shipment/{id}/rate:
+    patch:
+      tags:
+        - Shipment
+      summary: Rate shipment.
+      description: Rate existing shipment by planned, actual or negotiated values.
+      operationId: reRateShipment
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RateShipmentDto'
+      parameters:
+        - in: path
+          name: id
+          description: shipment id which needs to be re-rated.
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Re rated Shipment.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ShipmentDetailsDto'
+        '400':
+          description: bad input parameter
+
+  /shipments/updateStatus:
+    put:
+      tags:
+        - Shipment
+      summary: Update shipments status
+      operationId: updateShipmentsStatus
+      description: Fetches shipments by provided shipment ids and update the status
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateShipmentsStatusDto'
+      responses:
+        '200':
+          description: The updated shipments status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateShipmentsStatusResponseDto'
+        '400':
+          description: The shipments status could not be updated due to wrong or missing parameters
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Shipments with given ids could not be found
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+components:
+  schemas:
+    ShipmentsList:
+      type: array
+      items:
+        $ref: '#/components/schemas/ShipmentListItemDto'
+    PaginatedShipments:
+      required:
+        - content
+        - pageNum
+        - pageTotal
+      type: object
+      properties:
+        pageNum:
+          type: number
+        pageTotal:
+          type: number
+        total:
+          type: number
+        hasPrev:
+          type: boolean
+        hasNext:
+          type: boolean
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/ShipmentListItemDto'
+
+    CreateShipmentDto:
+      required:
+        - externalId
+        - serviceProvider
+        - sender
+        - service
+      type: object
+      properties:
+        externalId:
+          type: string
+        externalSystem:
+          type: string
+        status:
+          type: string
+        plannedDistance:
+          type: number
+        plannedStartTime:
+          type: string
+          format: date-time
+        plannedEndTime:
+          type: string
+          format: date-time
+        plannedBreakTime:
+          type: number
+        actualDistance:
+          type: number
+        actualStartTime:
+          type: string
+          format: date-time
+        actualEndTime:
+          type: string
+          format: date-time
+        actualBreakTime:
+          type: number
+        vehicleType:
+          type: string
+        rate:
+          type: number
+          nullable: true
+        currency:
+          type: string
+          nullable: true
+        clientId:
+          type: integer
+        createdAt:
+          type: string
+          format: date-time
+        lastUpdated:
+          type: string
+          format: date-time
+        serviceProvider:
+          $ref: '#/components/schemas/ServiceProviderParamDto'
+        sender:
+          $ref: '#/components/schemas/SenderParamDto'
+        service:
+          $ref: '#/components/schemas/ServiceParamDto'
+        workOrders:
+          type: array
+          items:
+            $ref: '#/components/schemas/WorkOrderParamDto'
+
+    RateShipmentDto:
+      type: object
+      properties:
+        distance:
+          $ref: '#/components/schemas/DistanceRatingRuleDto'
+        duration:
+          $ref: '#/components/schemas/DurationRatingRuleDto'
+
+    ShipmentDto:
+      type: object
+      properties:
+        id:
+          type: integer
+          nullable: true
+        externalId:
+          type: string
+        externalSystem:
+          type: string
+        vehicleType:
+          type: string
+        clientId:
+          type: integer
+        createdAt:
+          type: string
+          format: date-time
+        currency:
+          type: string
+          nullable: true
+        serviceProvider:
+          $ref: '#/components/schemas/SupplierDto'
+        sender:
+          $ref: '#/components/schemas/SenderDto'
+        service:
+          $ref: '#/components/schemas/ServiceDto'
+
+    ShipmentDetailsDto:
+      allOf:
+        - $ref: '#/components/schemas/ShipmentDto'
+      type: object
+      properties:
+        workOrders:
+          type: array
+          items:
+            $ref: '#/components/schemas/WorkOrderDto'
+        shipmentHistories:
+          type: array
+          items:
+            $ref: '#/components/schemas/ShipmentHistoryDto'
+    ShipmentHistoryDto:
+      type: object
+      properties:
+        id:
+          type: integer
+          nullable: true
+        status:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        createdBy:
+          type: string
+        distanceRatingRule:
+          $ref: '#/components/schemas/RatingRule'
+        durationRatingRule:
+          $ref: '#/components/schemas/RatingRule'
+        calculatedRate:
+          type: number
+          nullable: true
+        effectiveRate:
+          type: number
+          nullable: true
+        plannedDistance:
+          type: number
+        plannedStartTime:
+          type: string
+          format: date-time
+        plannedEndTime:
+          type: string
+          format: date-time
+        plannedBreakTime:
+          type: number
+        actualDistance:
+          type: number
+        actualStartTime:
+          type: string
+          format: date-time
+        actualBreakTime:
+          type: number
+        actualEndTime:
+          type: string
+          format: date-time
+        effectiveDistance:
+          type: number
+        effectiveStartTime:
+          type: string
+          format: date-time
+        effectiveEndTime:
+          type: string
+          format: date-time
+        additionalInformation:
+          type: string
+          nullable: true
+        changeNote:
+          type: string
+          nullable: true
+        calculatedPriceParts:
+          description:
+            details of the cost calculation. This field doesn't come by default, to load it provide the value
+            `lastShipmentHistory.calculatedPriceParts` to the `load` query param.
+          type: array
+          nullable: true
+          items:
+            $ref: '#/components/schemas/CalculatedPricePartDto'
+    ShipmentListItemDto:
+      allOf:
+        - $ref: '#/components/schemas/ShipmentDto'
+      type: object
+      properties:
+        lastShipmentHistory:
+          $ref: '#/components/schemas/ShipmentHistoryDto'
+
+    SupplierDto:
+      type: object
+      properties:
+        externalId:
+          type: string
+        name:
+          type: string
+          nullable: true
+        carId:
+          type: string
+          nullable: true
+        bpId:
+          type: string
+          nullable: true
+        type:
+          type: string
+          nullable: true
+        clientId:
+          type: integer
+          nullable: true
+    SenderDto:
+      type: object
+      properties:
+        externalId:
+          type: string
+        name:
+          type: string
+          nullable: true
+        buCode:
+          type: string
+          nullable: true
+        buType:
+          type: string
+          nullable: true
+        buCity:
+          type: string
+          nullable: true
+        clientId:
+          type: integer
+          nullable: true
+    ServiceDto:
+      type: object
+      properties:
+        externalId:
+          type: string
+        name:
+          type: string
+          nullable: true
+        sgrCode:
+          type: string
+          nullable: true
+        clientId:
+          type: integer
+          nullable: true
+
+    ServiceProviderParamDto:
+      type: object
+      required:
+        - externalId
+      properties:
+        externalId:
+          type: string
+
+    SenderParamDto:
+      type: object
+      required:
+        - externalId
+      properties:
+        externalId:
+          type: string
+
+    ServiceParamDto:
+      type: object
+      required:
+        - externalId
+      properties:
+        externalId:
+          type: string
+
+    RatingRule:
+      type: string
+      example: 'ACTUAL'
+      enum:
+        - 'PLANNED'
+        - 'ACTUAL'
+        - 'NEGOTIATED'
+
+    DistanceRatingRuleDto:
+      type: object
+      required:
+        - rule
+      properties:
+        rule:
+          $ref: '#/components/schemas/RatingRule'
+        distance:
+          type: number
+
+    DurationRatingRuleDto:
+      required:
+        - rule
+      properties:
+        rule:
+          $ref: '#/components/schemas/RatingRule'
+        startTime:
+          type: string
+          format: date-time
+        endTime:
+          type: string
+          format: date-time
+    WorkOrderParamDto:
+      type: object
+      properties:
+        workOrderId:
+          type: string
+        iSellOrderNumber:
+          type: string
+        status:
+          type: string
+        service:
+          $ref: '#/components/schemas/ServiceParamDto'
+    WorkOrderDto:
+      type: object
+      properties:
+        id:
+          type: integer
+          nullable: true
+        workOrderId:
+          type: string
+        iSellOrderNumber:
+          type: string
+        status:
+          type: string
+    CalculatedPricePartDto:
+      type: object
+      properties:
+        id:
+          type: integer
+          nullable: true
+        pricePartId:
+          type: integer
+          nullable: true
+        identification:
+          type: string
+          nullable: true
+        shipmentId:
+          type: integer
+          nullable: true
+        value:
+          type: number
+          nullable: true
+
+    UpdateShipmentsStatusDto:
+      type: object
+      required:
+        - shipmentStatus
+        - shipmentIds
+      description: Descriptor of the request that need to be provided in order to update shipments status
+      properties:
+        shipmentStatus:
+          type: string
+          description: The shipment status that needs to applay to the shipments
+        shipmentIds:
+          type: array
+          items:
+            type: integer
+          description: The ids of the shipments that need to be updated with the required status
+    UpdateShipmentsStatusResponseDto:
+      type: object
+      properties:
+        message:
+          type: string
+    ErrorResponse:
+      type: object
+      properties:
+        type:
+          type: string
+          format: uri
+          description: |
+            An absolute URI that identifies the problem type.
+          default: 'about:blank'
+          example: 'https://api.ingka.ikea.com/problem/constraint-violation'
+        title:
+          type: string
+          description: |
+            A short, summary of the problem type. Written in english and readable
+            for engineers (usually not suited for non technical stakeholders and
+            not localized); example: Service Unavailable
+        status:
+          type: integer
+          format: int32
+          description: |
+            The HTTP status code generated by the origin server for this occurrence
+            of the problem.
+          minimum: 100
+          maximum: 600
+          exclusiveMaximum: true
+          example: 503
+        detail:
+          type: string
+          description: |
+            A human readable explanation specific to this occurrence of the
+            problem.
+          example: Connection to database timed out
+        instance:
+          type: string
+          format: uri
+          description: |
+            An absolute URI that identifies the specific occurrence of the problem.
+            It may or may not yield further information if dereference.
+          example: /account/12345/msgs/abc

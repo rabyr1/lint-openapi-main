@@ -1,0 +1,1044 @@
+openapi: 3.0.3
+info:
+  title: Work Order API
+  version: '1.2.0'
+  description: 'APIs for work orders managed by Delivery and Services'
+  contact:
+    name: DSM Argonauts
+    url: https://confluence.build.ingka.ikea.com/pages/viewpage.action?pageId=240370308
+    email: dl.dsm.argonauts.nl@ingka.com
+  license:
+    name: INGKA GROUP INNER SOURCE LICENCE VERSION 1.0
+    url: https://github.com/ingka-group-digital/dsm-workorder/blob/main/license.md
+servers:
+  - url: https://api.ingka.ikea.com/work-order-manager/work-order-service
+    description: API Gateway PROD
+  - url: https://api.ingka.ppe.ikeadt.com/work-order-manager/work-order-service
+    description: API Gateway STAGE
+security:
+  - bearerAuth: []
+    backendServiceAuthorization: []
+paths:
+  /workorders:
+    get:
+      tags:
+        - Work Orders
+      summary: list work orders
+      description: Get a list of work orders.
+      operationId: listWorkOrders
+      parameters:
+        - in: query
+          name: size
+          description: number of work orders to return
+          schema:
+            type: integer
+            format: int32
+            minimum: 1
+            maximum: 100
+            default: 10
+        - in: query
+          name: page
+          description: number of the page in the list to return
+          schema:
+            type: integer
+            format: int32
+            minimum: 1
+            default: 1
+        - in: query
+          name: $sort
+          description: oData parameter to sort the list to return
+          schema:
+            type: string
+        - in: query
+          name: serviceOrderNumber
+          description: The serviceOrderNumber alpha-numeric code
+          schema:
+            type: string
+            example: '99887630'
+        - in: query
+          name: salesOrderId
+          description: the salesOrderId Id
+          schema:
+            type: integer
+            format: int32
+        - in: query
+          name: type
+          description: the type of workorder
+          schema:
+            type: string
+            description: Comma separated string of workorder types
+            example: 'PUP,CLICK_COLLECT_STORE,LOCKER'
+        - in: query
+          name: deliveryDateFrom
+          description: start of delivery time window (inclusive)
+          schema:
+            type: string
+            description: Local date and time in ISO 8601 (without zone and time offset)
+            example: '2022-05-31T14:00:00'
+        - in: query
+          name: deliveryDateTo
+          description: end of delivery time window (inclusive)
+          schema:
+            type: string
+            description: Local date and time in ISO 8601 (without zone and time offset)
+            example: '2022-05-31T14:00:00'
+        - in: query
+          name: sellerOrganizationCode
+          description: Seller Organization Code
+          schema:
+            type: string
+        - in: query
+          name: creationDate
+          description: The date on which the workorder was created
+          schema:
+            type: string
+            description: Local date in ISO 8601 (without zone and time offset)
+            example: '2022-05-31'
+        - in: query
+          name: carrierId
+          description: Carrier represent Service provider ID
+          schema:
+            type: string
+        - in: query
+          name: nodeKey
+          description: the nodeKey
+          schema:
+            type: string
+        - in: query
+          name: deliveryMethods
+          description: Type of SGR service requested to the TSP (comma separated list)
+          schema:
+            type: string
+            example: SGR70000879,SGR40000951
+        - in: query
+          name: shippingBusinessUnits
+          description: Shipping business units (comma separated list)
+          schema:
+            type: string
+            example: 9001.STO,269.CDC
+        - in: query
+          name: postalCode
+          description: Partial Search/Starting-with on Postal Code (at least 2 alphanumeric chars)
+          schema:
+            type: string
+            example: 225
+      responses:
+        '200':
+          description: a list of work orders
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkOrdersDTO'
+        '400':
+          description: bad input parameter
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    post:
+      tags:
+        - Work Orders
+      summary: create a work order
+      description: Create a work order.
+      operationId: createWorkOrder
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WorkOrder'
+      responses:
+        '202':
+          description: work order create request accepted
+        '400':
+          description: bad input parameter
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /workorders/{workOrderId}:
+    get:
+      tags:
+        - Work Orders
+      summary: get a work order
+      description: Get details of a given work order.
+      operationId: getWorkOrder
+      parameters:
+        - name: workOrderId
+          in: path
+          required: true
+          description: the work order Id
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: the requested work order
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkOrderDTO'
+        '400':
+          description: bad input parameter
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: work order not found
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /workorders/compartment/{compartment}/serviceOrderNumber/{serviceOrderNumber}:
+    get:
+      tags:
+        - Work Orders
+      summary: get a work order in compartment by its service number
+      description: Get details of a given work order.
+      operationId: getWorkOrderByCompartmentAndNumber
+      parameters:
+        - name: compartment
+          in: path
+          required: true
+          description: compartment of the workorder
+          schema:
+            $ref: '#/components/schemas/Compartment'
+        - name: serviceOrderNumber
+          in: path
+          required: true
+          description: work order alpha-numeric code
+          schema:
+            type: string
+            example: '99887630'
+      responses:
+        '200':
+          description: the requested work order
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkOrderDTO'
+        '400':
+          description: bad input parameter
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: work order not found
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /workorders/delivery-service:
+    get:
+      tags:
+        - Work Orders
+      summary: list delivery serivce work orders
+      description: Get a list of delivery service work orders.
+      operationId: listDeliveryServiceWorkOrders
+      parameters:
+        - in: query
+          name: limit
+          description: maximum number of work orders to return
+          schema:
+            type: integer
+            format: int32
+            minimum: 0
+            maximum: 100
+            default: 10
+      responses:
+        '200':
+          description: a list of work orders
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkOrdersDTO'
+        '400':
+          description: bad input parameter
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /workorders/delivery-service/{workOrderId}:
+    get:
+      tags:
+        - Work Orders
+      summary: get a delivery service work order
+      description: Get details of a given delivery service work order.
+      operationId: getDeliveryServiceWorkOrder
+      parameters:
+        - name: workOrderId
+          in: path
+          required: true
+          description: the work order Id
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: the requested work order
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkOrderDTO'
+        '400':
+          description: bad input parameter
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: work order not found
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /workorders/delivery-service/{workOrderId}/customer-delivery-units:
+    get:
+      tags:
+        - Work Orders
+      summary: list CDUs of a delivery service work order
+      description: Get a list of CDUs for a given delivery service work order.
+      operationId: listDeliveryServiceWorkOrderCDUs
+      parameters:
+        - name: workOrderId
+          in: path
+          required: true
+          description: the work order Id
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: a list of customer delivery units
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerDeliveryUnitsDTO'
+        '400':
+          description: bad input parameter
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: work order not found
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /workorders/delivery-service/{workOrderId}/customer-delivery-units/{cduId}:
+    get:
+      tags:
+        - Work Orders
+      summary: get a CDU of a delivery service work order
+      description: Get a list of CDUs for a given delivery service work order.
+      operationId: getDeliveryServiceWorkOrderCDU
+      parameters:
+        - name: workOrderId
+          in: path
+          required: true
+          description: the work order Id
+          schema:
+            type: string
+            format: uuid
+        - name: cduId
+          in: path
+          required: true
+          description: the CDU Id
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: the requested customer delivery unit
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerDeliveryUnitDTO'
+        '400':
+          description: bad input parameter
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: work order or customer delivery unit not found
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /workorders/provided-service:
+    get:
+      tags:
+        - Work Orders
+      summary: list provided serivce work orders
+      description: Get a list of provided service work orders.
+      operationId: listProvidedServiceWorkOrders
+      parameters:
+        - in: query
+          name: limit
+          description: maximum number of work orders to return
+          schema:
+            type: integer
+            format: int32
+            minimum: 0
+            maximum: 100
+            default: 10
+      responses:
+        '200':
+          description: a list of work orders
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkOrdersDTO'
+        '400':
+          description: bad input parameter
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /workorders/provided-service/{workOrderId}:
+    get:
+      tags:
+        - Work Orders
+      summary: get a provided service work order
+      description: Get details of a given provided service work order.
+      operationId: getProvidedServiceWorkOrder
+      parameters:
+        - name: workOrderId
+          in: path
+          required: true
+          description: the work order Id
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: the requested work order
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkOrderDTO'
+        '400':
+          description: bad input parameter
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: work order not found
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /customer-delivery-units:
+    get:
+      tags:
+        - Work Orders
+      summary: list customer delivery units
+      description: Get a list of Customer Delivery Units.
+      operationId: listCustomerDeliveryUnits
+      parameters:
+        - in: query
+          name: limit
+          description: maximum number of customer delivery units to return
+          schema:
+            type: integer
+            format: int32
+            minimum: 0
+            maximum: 100
+            default: 10
+      responses:
+        '200':
+          description: a list of customer delivery units
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerDeliveryUnitsDTO'
+        '400':
+          description: bad input parameter
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    post:
+      tags:
+        - Work Orders
+      summary: create a customer delivery unit
+      description: Create a Customer Delivery Unit.
+      operationId: createCustomerDeliveryUnit
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CustomerDeliveryUnit'
+      responses:
+        '202':
+          description: customer deliver unit create request accepted
+        '400':
+          description: bad input parameter
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /customer-delivery-units/{cduId}:
+    get:
+      tags:
+        - Work Orders
+      summary: get a customer delivery unit
+      description: Get details of a given Customer Delivery Unit.
+      operationId: getCustomerDeliveryUnit
+      parameters:
+        - name: cduId
+          in: path
+          required: true
+          description: the CDU Id
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: the requested customer delivery unit
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerDeliveryUnitDTO'
+        '400':
+          description: bad input parameter
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: customer delivery unit not found
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /base-data/node-keys:
+    get:
+      tags:
+        - BaseData
+      summary: Get all the node keys
+      description: Retrieve all the node keys
+      operationId: GetNodeKeys
+      responses:
+        200:
+          description: The list of all node keys and the country associated to them
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NodeKeysDTO'
+  /base-data/sgr-delivery-methods:
+    get:
+      tags:
+        - BaseData
+      summary: Get Service Global Registry delivery methods
+      description: Retrieve all delivery methods from service global registryService Global Registry
+      operationId: GetSgrDeliveryMethods
+      responses:
+        200:
+          description: The list of all delivery methods from Service Global Registry
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SgrDeliveryMethodsDTO'
+  /base-data/carriers:
+    get:
+      tags:
+        - Carriers
+      summary: list of carriers
+      description: Get a list of carriers.
+      operationId: listCarriers
+      responses:
+        '200':
+          description: a list of carriers
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CarriersDTO'
+        '400':
+          description: bad input parameter
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+components:
+  schemas:
+    CountryCode:
+      type: string
+      description: Two letters country code in ISO 3166-1 format
+      example: 'NL'
+    Compartment:
+      type: string
+      description: Compartment code in two letters format
+      enum:
+        - EU
+        - NA
+        - AP
+        - CN
+    WorkOrderStatus:
+      type: string
+      enum:
+        - Created
+        - Cancelled
+        - Confirmed
+    WorkOrderServiceType:
+      type: string
+      enum:
+        - DeliveryService
+        - ProvidedService
+    WorkOrder:
+      type: object
+      properties:
+        serviceType:
+          $ref: '#/components/schemas/WorkOrderServiceType'
+        serviceOrderNumber:
+          type: number
+          example: 16137437266
+        salesOrderId:
+          type: string
+          example: 'IKSE3726662'
+        compartment:
+          $ref: '#/components/schemas/Compartment'
+        countryCode:
+          $ref: '#/components/schemas/CountryCode'
+        type:
+          type: string
+          example: 'Pick up points'
+        packages:
+          type: number
+          description: Number of packages in the work order
+          example: 42
+    WorkOrdersDTO:
+      type: object
+      properties:
+        workorders:
+          type: array
+          items:
+            $ref: '#/components/schemas/WorkOrderDTO'
+    WorkOrderDTO:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        creationDate:
+          type: string
+          format: date-time
+        modifyDate:
+          type: string
+          format: date-time
+        serviceOrderNumber:
+          type: string
+          example: '16137437266'
+        salesOrderId:
+          type: string
+          example: 'IKSE3726662'
+        compartment:
+          $ref: '#/components/schemas/Compartment'
+        countryCode:
+          $ref: '#/components/schemas/CountryCode'
+        type:
+          type: string
+          example: 'Pick up points'
+        packages:
+          type: number
+          description: Number of packages in the work order
+          example: 42
+        status:
+          $ref: '#/components/schemas/WorkOrderStatus'
+        deliveryDate:
+          type: string
+          description: Local date and time in ISO 8601 (without zone and time offset)
+          example: '2022-05-31T14:00:00'
+        originalDeliveryWindowUTC:
+          $ref: '#/components/schemas/Range'
+        cdus:
+          type: array
+          items:
+            $ref: '#/components/schemas/CduDTO'
+        addresses:
+          type: array
+          items:
+            $ref: '#/components/schemas/AddressDTO'
+        orderLines:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderLineDTO'
+        serviceProvider:
+          $ref: '#/components/schemas/ServiceProviderDTO'
+        trackingEvents:
+          type: array
+          items:
+            $ref: '#/components/schemas/TrackingEventDTO'
+        shipmentTrackingStatus:
+          type: string
+          description: Shipment tracking status description provided by Centiro
+          example: 'Picked up by customer'
+        carrier:
+          $ref: '#/components/schemas/CarrierDTO'
+        nodeKey:
+          type: string
+          example: 'LSC.2533'
+        deliveryMethod:
+          $ref: '#/components/schemas/SgrDeliveryMethodDTO'
+        shippingBusinessUnits:
+          type: array
+          items:
+            $ref: '#/components/schemas/BusinessUnitDTO'
+        sellingBusinessUnit:
+          type: string
+          description: Business Unit of the Selling store
+          example: 'STO.949'
+        deliveryPostalCode:
+          type: string
+          description: Delivery Address Postal Code
+          example: '1054wn'
+        promisedDeliveryWindowUTC:
+          $ref: '#/components/schemas/PromisedDeliveryWindowDTO'
+    CarriersDTO:
+      type: object
+      properties:
+        carriers:
+          type: array
+          items:
+            $ref: '#/components/schemas/CarrierDTO'
+    CarrierDTO:
+      type: object
+      properties:
+        id:
+          type: string
+        label:
+          type: string
+    CduDTO:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 'af69893f-a41d-4d6f-8a00-d4a81b62422c'
+        trackingNumber:
+          type: string
+          example: '110373685'
+        trackingUrl:
+          type: string
+          example: 'http://www.genericlink.com/110373667'
+        weight:
+          $ref: '#/components/schemas/CduWeightMeasure'
+        volume:
+          $ref: '#/components/schemas/CduVolumeMeasure'
+        orderLines:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderLineDTO'
+        trackingEvents:
+          type: array
+          items:
+            $ref: '#/components/schemas/TrackingEventDTO'
+    TrackingEventDTO:
+      type: object
+      properties:
+        location:
+          type: string
+        description:
+          type: string
+        externalCode:
+          type: string
+        trackingLevel:
+          type: string
+        externalDescription:
+          type: string
+        code:
+          type: string
+        signedBy:
+          type: string
+        category:
+          type: string
+        reasonComment:
+          type: string
+        locationCode:
+          type: string
+        eventTimeLocal:
+          type: string
+          description: Local date and time without time zone in ISO 8601 format
+          example: '2022-08-10T07:25:50'
+        eventTimeUTC:
+          type: string
+          description: Date and time without time zone in ISO 8601 format
+          example: '2022-08-10T07:25:50'
+        timeZone:
+          type: integer
+          format: int32
+        milestoneStatus:
+          type: string
+    AddressDTO:
+      type: object
+      properties:
+        type:
+          type: string
+          description: Type of address
+          enum:
+            - Sender
+            - Receiver
+          example: 'Sender'
+        name:
+          type: string
+          description: Recipient name
+          example: '895 IKEA Store GB'
+        address:
+          type: string
+          description: street address and street address house number
+          example: 'Prinsengracht 1'
+        postalCode:
+          type: string
+          description: postal code
+          example: '1052 CR'
+        city:
+          type: string
+          description: city name
+          example: 'Amsterdam'
+        country:
+          type: string
+          description: ISO2 country code
+          example: 'NL'
+        email:
+          type: string
+          description: destination contact email address
+          example: 'test@example.com'
+    OrderLineDTO:
+      type: object
+      properties:
+        orderLineNumber:
+          type: integer
+          example: 3
+        productNumber:
+          type: string
+          example: '70294339'
+        itemDescription:
+          type: string
+          example: 'LISABO table 140x78 ash veneer'
+        quantityOrdered:
+          type: number
+          format: float
+          example: 1.0
+        weight:
+          $ref: '#/components/schemas/CduWeightMeasure'
+        volume:
+          $ref: '#/components/schemas/CduVolumeMeasure'
+    PackageDimension:
+      type: object
+      properties:
+        width:
+          $ref: '#/components/schemas/DimensionMeasure'
+        height:
+          $ref: '#/components/schemas/DimensionMeasure'
+        length:
+          $ref: '#/components/schemas/DimensionMeasure'
+        volume:
+          $ref: '#/components/schemas/VolumeMeasure'
+        weight:
+          $ref: '#/components/schemas/WeightMeasure'
+    DimensionMeasure:
+      type: object
+      properties:
+        value:
+          type: number
+          format: float
+        unit:
+          $ref: '#/components/schemas/DimensionUnit'
+    VolumeMeasure:
+      type: object
+      properties:
+        value:
+          type: number
+          format: float
+        unit:
+          $ref: '#/components/schemas/VolumeUnit'
+    WeightMeasure:
+      type: object
+      properties:
+        value:
+          type: number
+          format: float
+        unit:
+          $ref: '#/components/schemas/WeightUnit'
+    CduVolumeMeasure:
+      type: object
+      properties:
+        value:
+          type: number
+          format: float
+        unit:
+          $ref: '#/components/schemas/CduVolumeUnit'
+    CduWeightMeasure:
+      type: object
+      properties:
+        value:
+          type: number
+          format: float
+        unit:
+          $ref: '#/components/schemas/CduWeightUnit'
+    DimensionUnit:
+      enum: ['CM', 'METER', 'MILE', 'KM', 'FEET', 'IN']
+    VolumeUnit:
+      enum: ['CUMETER', 'CIN', 'QUART', 'ML', 'LITER', 'GALLON', 'CUMILE', 'CUKM', 'CUFEET', 'CUCENTIMETER']
+    WeightUnit:
+      enum: ['GRAM', 'KG', 'LBS', 'TON']
+    CduVolumeUnit:
+      enum: ['m3']
+    CduWeightUnit:
+      enum: ['kg']
+    CustomerDeliveryUnit:
+      type: object
+      properties:
+        workOrderId:
+          type: string
+          format: uuid
+        packageDimension:
+          $ref: '#/components/schemas/PackageDimension'
+    CustomerDeliveryUnitsDTO:
+      type: object
+      properties:
+        customerDeliveryUnits:
+          type: array
+          items:
+            $ref: '#/components/schemas/CustomerDeliveryUnitDTO'
+    CustomerDeliveryUnitDTO:
+      type: object
+      properties:
+        id:
+          type: string
+        workOrderId:
+          type: string
+          format: uuid
+        label:
+          type: string
+        packageDimension:
+          $ref: '#/components/schemas/PackageDimension'
+    ServiceProviderDTO:
+      type: object
+      properties:
+        carrierServiceDescription:
+          type: string
+        carrierDescription:
+          type: string
+        carrierService:
+          type: string
+        carrier:
+          type: string
+        tspId:
+          type: string
+          description: Identification number of a given transport service provider
+          example: '99002'
+    Range:
+      type: object
+      properties:
+        from:
+          type: string
+        to:
+          type: string
+    PromisedDeliveryWindowDTO:
+      type: object
+      properties:
+        from:
+          type: string
+        to:
+          type: string
+        timezone:
+          type: string
+    ErrorResponse:
+      type: object
+      properties:
+        type:
+          type: string
+          format: uri
+          description: |
+            An absolute URI that identifies the problem type.
+          default: 'about:blank'
+          example: 'https://api.ingka.ikea.com/problem/constraint-violation'
+        title:
+          type: string
+          description: |
+            A short, summary of the problem type. Written in english and readable
+            for engineers (usually not suited for non technical stakeholders and
+            not localized); example: Service Unavailable
+        status:
+          type: integer
+          format: int32
+          description: |
+            The HTTP status code generated by the origin server for this occurrence
+            of the problem.
+          minimum: 100
+          maximum: 600
+          exclusiveMaximum: true
+          example: 503
+        detail:
+          type: string
+          description: |
+            A human readable explanation specific to this occurrence of the
+            problem.
+          example: Connection to database timed out
+        instance:
+          type: string
+          format: uri
+          description: |
+            An absolute URI that identifies the specific occurrence of the problem.
+            It may or may not yield further information if dereference.
+          example: /account/12345/msgs/abc
+    NodeKeysDTO:
+      type: array
+      items:
+        $ref: '#/components/schemas/NodeKeyDTO'
+    NodeKeyDTO:
+      type: object
+      properties:
+        nodeKey:
+          type: string
+        country:
+          type: string
+    SgrDeliveryMethodsDTO:
+      type: object
+      properties:
+        deliveryMethods:
+          type: array
+          items:
+            $ref: '#/components/schemas/SgrDeliveryMethodDTO'
+    SgrDeliveryMethodDTO:
+      type: object
+      properties:
+        code:
+          type: string
+        name:
+          type: string
+    BusinessUnitDTO:
+      type: object
+      properties:
+        type:
+          type: string
+          description: |
+            Business units are represented as a pair of type and code. The type tells if the BU is a store, distribution center etc.
+            Types could be: LSC, CDC, STO, CTY, CON etc.
+          example: 'LSC'
+        code:
+          type: string
+          description: |
+            Business units are represented as a pair of type and code. The type tells if the BU is a store, distribution center etc.
+            The code is uniquely identifying the BU and is usually a number. For example: LSC.061, LSC.125, STO.017, CDC.012.
+            Codes could also be ISO country codes or ISO geografic regions. For example: CTY.DE, CON.NA
+          example: '061'
+      required:
+        - type
+        - code
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+    backendServiceAuthorization:
+      type: apiKey
+      name: X-Backend-Service-Authorization
+      description: Internal JWT provided by Auth service
+      in: header

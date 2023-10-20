@@ -1,0 +1,321 @@
+swagger: '2.0'
+info:
+  description:
+    APIs exposed by product ATP (Available To Promise) in OF&D capability as part of modernization initiative to provide
+    items availability
+  version: '1.0.21'
+  contact:
+    name: ATP (Order Fulfilment & Delivery)
+    email: dl.ofd.atp.se@ingka.com
+  x-ibm-name: itemavailability
+  title: ATP Solution APIs
+  termsOfService: http://javainuse.com
+  license:
+    name: JavaInUse License
+host: localhost:8080
+basePath: /atp/api
+schemes:
+  - https
+produces:
+  - application/json;version=3
+tags:
+  - name: ItemsAvailability
+    description: ItemsAvailability
+paths:
+  /items/availability:
+    post:
+      tags:
+        - ItemsAvailability
+      description: Get availability for items as per delivery type provided.
+      operationId: ITEMS_AVAILABILITY
+      consumes:
+        - application/json;version=3
+      produces:
+        - application/json;version=3
+      parameters:
+        - in: body
+          name: request
+          description: request
+          required: true
+          schema:
+            $ref: '#/definitions/AvailabilityRequest'
+        - name: version
+          in: header
+          required: true
+          type: string
+          default: application/vnd.ikea.api+json;version=3
+          enum:
+            - application/vnd.ikea.api+json;version=3
+      responses:
+        '200':
+          description: Success
+          schema:
+            $ref: '#/definitions/AvailabilityResponse'
+        '201':
+          description: Created
+        '401':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  type:
+                    type: string
+                  title:
+                    type: string
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+definitions:
+  Address:
+    type: object
+    properties:
+      country:
+        type: string
+        description: 'Customer Country code. Eg: For Sweden -> SE'
+      zipCode:
+        type: string
+        description: 'Customer Zip code. Eg: 25461'
+    title: Address
+  AvailabilityRequest:
+    type: object
+    required:
+      - items
+      - shipToAddress
+    properties:
+      businessUnit:
+        $ref: '#/definitions/BusinessUnit'
+      cartContextRequired:
+        type: boolean
+        description:
+          To cache to cart context if flag value true then ATP will cached the cart context for future communication and
+          return the cart id
+      cartId:
+        type: string
+        description: the cart id for a saved cart
+      deliveryTypes:
+        type: array
+        description: Transport Delivery type like STANDARD, EXPRESS etc.
+        items:
+          type: string
+          enum:
+            - CURBSIDE
+            - EXPRESS
+            - EXPRESS_CURBSIDE
+            - LOCKER
+            - PICKUP_AT_STORE
+            - PICKUP_POINT
+            - STANDARD
+            - UNKNOWN
+      isCartContextRequired:
+        type: boolean
+        description: the boolean attribute to indicate whether cart context needs to be caclulated
+      items:
+        type: array
+        description: Item list for which availability needs to be calculated
+        items:
+          $ref: '#/definitions/ItemRequest'
+      shipToAddress:
+        $ref: '#/definitions/ShippingAddress'
+    title: AvailabilityRequest
+  AvailabilityResponse:
+    type: object
+    properties:
+      cartId:
+        type: string
+        description: 'cart id for managing the cart context Eg: 3b00368c145e416ca93f871d25a725c6'
+      deliveryTypes:
+        type: array
+        items:
+          $ref: '#/definitions/TentativeLeadTime'
+      error:
+        $ref: '#/definitions/Error'
+      itemAvailability:
+        type: array
+        items:
+          $ref: '#/definitions/ItemAvailability'
+      shipToAddress:
+        $ref: '#/definitions/Address'
+      timezone:
+        type: string
+        description: 'Timezone of shipping address. Eg: Europe/London'
+    title: AvailabilityResponse
+  BusinessUnit:
+    type: object
+    description: This is not currently used in ATP Step1
+    properties:
+      code:
+        type: string
+        description: 'Fulfilment unit code. Eg: 567'
+      type:
+        type: string
+        description: 'Fulfilment unit type .Eg: For Stores -> STO'
+    title: BusinessUnit
+  DeliveryMethod:
+    type: object
+    properties:
+      description:
+        type: string
+      id:
+        type: string
+        description: 'Delivery method id Eg: SGR40000606'
+      type:
+        type: string
+        enum:
+          - PARCEL
+          - TRUCK
+          - UNKNOWN
+    title: DeliveryMethod
+  DeliveryMethodWithLeadTime:
+    type: object
+    properties:
+      id:
+        type: string
+      indicativeLeadTime:
+        type: string
+        description: 'Indicative lead time in days for an item when ATP do not have lead time  Eg: 5 - 8'
+      leadTime:
+        type: string
+        example: yyyy-MM-dd'T'HH:mm:ss.SSSZ
+        description: 'Delivery lead time for an item Eg: 2021-03-23T11:33:17.668+0000'
+    title: DeliveryMethodWithLeadTime
+  DeliveryType:
+    type: object
+    description: 'Transport Delivery type like STANDARD, EXPRESS etc.'
+    properties:
+      available:
+        type: string
+        description: 'Flag yo determine if item is available or not. NA flag states its not eligible.'
+      availableQty:
+        type: number
+        format: double
+        description: 'Quantity of item available'
+      deliveryMethods:
+        type: array
+        items:
+          $ref: '#/definitions/DeliveryMethod'
+      error:
+        $ref: '#/definitions/Error'
+      indicativeLeadTime:
+        type: string
+        description: 'Indicative lead time in days for an item when ATP do not have lead time  Eg: 5 - 8'
+      leadTime:
+        type: string
+        example: yyyy-MM-dd'T'HH:mm:ss.SSSZ
+        description: 'Delivery lead time for an item Eg: 2021-03-23T11:33:17.668+0000'
+      type:
+        type: string
+        description: 'Transport Delivery type like STANDARD, EXPRESS etc.'
+        enum:
+          - CURBSIDE
+          - EXPRESS
+          - EXPRESS_CURBSIDE
+          - LOCKER
+          - PICKUP_AT_STORE
+          - PICKUP_POINT
+          - STANDARD
+          - STANDARD_RETURN
+          - UNKNOWN
+    title: DeliveryType
+  Error:
+    type: object
+    properties:
+      errorCode:
+        type: string
+        description: 'HTTP status error code.'
+      errorDescription:
+        type: string
+        description: 'Detailed error message, may contain debug logs for internal use'
+    title: Error
+  ItemAvailability:
+    type: object
+    properties:
+      deliveryTypes:
+        type: array
+        items:
+          $ref: '#/definitions/DeliveryType'
+      error:
+        $ref: '#/definitions/Error'
+      id:
+        type: string
+        description: 'Item id'
+      itemNo:
+        type: string
+        description: 'Item number. Eg: 50000875'
+      itemType:
+        type: string
+        description: 'Item type. Eg: ART, SGR, SPR etc.'
+      requiredQty:
+        type: number
+        format: double
+        description: 'Item quantity'
+    title: ItemAvailability
+  ItemRequest:
+    type: object
+    required:
+      - itemNo
+      - itemType
+      - requiredQty
+    properties:
+      availabilityType:
+        type: string
+        description:
+          'Only lead time requested. Requested business unit will be the fulfillment unit and requested quantity will be
+          the available quantity'
+        enum:
+          - LEAD_TIME
+      id:
+        type: string
+        description: 'Item id'
+      itemNo:
+        type: string
+        description: 'Item number. Eg: 50000875'
+      itemType:
+        type: string
+        description: 'Item type. Eg: ART'
+      requiredQty:
+        type: number
+        description: 'Item quantity required by consumer'
+        format: double
+    title: ItemRequest
+  ShippingAddress:
+    type: object
+    required:
+      - country
+      - zipCode
+    properties:
+      country:
+        type: string
+        description: 'Customer Country code. Eg: For Sweden -> SE'
+      zipCode:
+        type: string
+        description: 'Customer Zip code. Eg: 25461'
+    title: ShippingAddress
+  TentativeLeadTime:
+    type: object
+    description: 'Delivery method and Lead time for full cart'
+    properties:
+      deliveryMethods:
+        type: array
+        items:
+          $ref: '#/definitions/DeliveryMethodWithLeadTime'
+      indicativeLeadTime:
+        type: string
+        description: 'Indicative lead time in days for an item when ATP do not have lead time  Eg: 5 - 8'
+      leadTime:
+        type: string
+        example: yyyy-MM-dd'T'HH:mm:ss.SSSZ
+        description: 'Lead time for delivery method for full cart Eg: 2021-03-23T11:33:17.669+0000'
+      type:
+        type: string
+        enum:
+          - CURBSIDE
+          - EXPRESS
+          - EXPRESS_CURBSIDE
+          - LOCKER
+          - PICKUP_AT_STORE
+          - PICKUP_POINT
+          - STANDARD
+          - UNKNOWN
+    title: TentativeLeadTime

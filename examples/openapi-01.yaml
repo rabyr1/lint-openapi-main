@@ -1,0 +1,1480 @@
+openapi: 3.0.3
+info:
+  title: Auth Service API
+  version: 1.0.37
+  description: Authentication service that gives user a possibility to authenticate and view client information.
+  contact:
+    name: Delivery and Service Management
+    url: https://confluence.build.ingka.ikea.com/pages/viewpage.action?pageId=240264149
+    email: o365g_deliveryandservicesmanagement_itnl012@ingka.com
+
+servers:
+  - url: https://api.ingka.com/api
+    description: API GATEWAY PROD
+  - url: https://api.ingka.ppe.com/api
+    description: API GATEWAY STAGE
+  - url: https://api.europe.test.deliverandservice.com/api
+    description: API TEST
+
+paths:
+  /authorize:
+    get:
+      operationId: hasAuthority
+      summary: Verifies if the currently authenticated user has a particular permission on a given client.
+      tags:
+        - Verification
+      security:
+        - backendServiceAuthorization: []
+      parameters:
+        - name: permissionName
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: service
+          in: query
+          required: true
+          schema:
+            $ref: '#/components/schemas/Service'
+        - name: clientId
+          in: query
+          required: true
+          schema:
+            type: integer
+            format: int32
+            minimum: 1
+      responses:
+        204:
+          description: Verification passes. User has a given permission on a given client.
+        401:
+          description: Something wrong with the token itself (expired, invalid or malfomed).
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        403:
+          description: Verification fails. User does not have a given permission on a given client.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /identity-providers:
+    get:
+      tags:
+        - Identity Providers
+      summary: Gets a list of identity providers that the users can sign in in the current domain.
+      operationId: getIdentityProviders
+      parameters:
+        - name: redirectUrl
+          in: query
+          required: true
+          schema:
+            type: string
+          description: |
+            An absolute redirection endpoint as described in rfc6749#section-3.1.2 (OAuth 2.0 specification).
+      responses:
+        200:
+          description: A list of identity providers
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetIdentityProvidersResponse'
+        400:
+          description: Invalid or missing redirectUrl
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /token:
+    post:
+      tags:
+        - Tokens
+      summary: |
+        Creates a list of ID tokens for every service user has access to.
+        Use this endpoint to exchange authorizationCode or refreshToken.
+      operationId: createToken
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTokenRequest'
+        required: true
+      responses:
+        200:
+          description: The result of the new login with the refresh token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenResult'
+        400:
+          description: Invalid request or malformed token
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    get:
+      tags:
+        - Tokens
+      summary: Gets a list of long-lived tokens.
+      operationId: getTokens
+      security:
+        - backendServiceAuthorization: []
+      responses:
+        200:
+          description: The result of the new login with the refresh token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetTokensResponse'
+        400:
+          description: Invalid request or malformed token
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        401:
+          description: Something wrong with the access information verification
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        403:
+          description: Forbidden - missing access to the resource
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /clients:
+    get:
+      operationId: getClients
+      summary: Gets a list of clients that the current user is associated with.
+      tags:
+        - Clients
+      security:
+        - backendServiceAuthorization: []
+      parameters:
+        - name: q
+          in: query
+          required: false
+          schema:
+            type: string
+          description: |
+            An optional value to filter clients by. Clients are filtered on name or external reference.
+        - name: permissions
+          in: query
+          required: false
+          description: |
+            Filters clients based on the permissions current user has to each client.
+            Given permissions should belong to the same service.
+            Additionally, combine with 'service' filter to make sure filtering by permissions of the intended service.
+          schema:
+            type: array
+            items:
+              type: string
+        - name: permissionFilterType
+          in: query
+          required: false
+          description: |
+            Based on the type, the permissions filter will be applied in one or the other way.
+            ANY - only clients that user has any of the given permissions to will be returned.
+            ALL - only clients that user has all of the given permissions to will be returned.
+            This parameter is required if permissions parameter is provided.
+            Filter by ALL permissions is not implemented yet and if used will result in 500 Internal Server Error.
+          schema:
+            $ref: '#/components/schemas/PermissionFilterType'
+        - name: service
+          in: query
+          required: false
+          description: |
+            Filter clients where user has access to a given service.
+          schema:
+            $ref: '#/components/schemas/Service'
+        - name: omitDetails
+          in: query
+          required: false
+          description: |
+            If true, only the client id will be returned and other fields may be null.
+            If false, all the details will be returned.
+          schema:
+            type: boolean
+        - name: externalReference
+          in: query
+          required: false
+          schema:
+            type: string
+          description: |
+            Unique identifier of the client in the system (e.g. CBD) it originated from (e.g. STO101).
+        - name: hierarchicallyFromClient
+          in: query
+          required: false
+          description: |
+            Filters clients based on the their hierarchical connection to the given client.
+            Must be used together with `hierarchicallyType` parameter.
+          schema:
+            type: integer
+            format: int32
+        - name: hierarchicallyType
+          in: query
+          required: false
+          description: |
+            CHILDREN - returns child clients of the given client in the `hierarchicallyFromClient` parameter.
+            PARENTS - (not implemented) returns parent clients of the given client in the `hierarchicallyFromClient` parameter.
+            This filter applies only if `hierarchicallyFromClient` parameter is not empty.
+            Parameter `hierarchicallyType` is required if `hierarchicallyFromClient` parameter is not empty.
+          schema:
+            $ref: '#/components/schemas/HierarchicallyFilterType'
+        - in: query
+          name: sort
+          description: Sort order
+          schema:
+            type: string
+            enum: [asc, desc]
+        - name: hierarchyType
+          in: query
+          schema:
+            $ref: '#/components/schemas/ClientHierarchyType'
+          required: true
+          description: |
+            Filters clients based on their relation to each other in the hieararchical tree.
+        - name: page
+          in: query
+          description: The page of all results that should be returned.
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: perPage
+          in: query
+          description:
+            The amount of results to return in a single page. Must be between 1 and 2000. Default value is 10. Max value
+            if omitDetails is false - 100. Max value if omitDetails is true - 2000.
+          schema:
+            type: integer
+            default: 10
+            minimum: 1
+            maximum: 2000
+      responses:
+        200:
+          description: A clients search result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClientSearchResult'
+        401:
+          description: Something wrong with the access information verification
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    post:
+      operationId: createClient
+      summary: Creates a client.
+      tags:
+        - Clients
+      security:
+        - backendServiceAuthorization: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ClientInput'
+        required: true
+      responses:
+        200:
+          description: The result of the new client
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Client'
+        400:
+          description: Bad request
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        401:
+          description: Something wrong with the access information verification
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        403:
+          description: Forbidden - the operation is not allowed for the given user on the selected client
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /clients/{id}:
+    parameters:
+      - in: path
+        name: id
+        description: The id of the client
+        required: true
+        schema:
+          type: integer
+          format: int32
+          minimum: 1
+    get:
+      operationId: getClient
+      summary: Gets a client.
+      tags:
+        - Clients
+      security:
+        - backendServiceAuthorization: []
+      responses:
+        200:
+          description: A client
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Client'
+        401:
+          description: Something wrong with the access information verification
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        404:
+          description: Client not found
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    put:
+      operationId: updateClient
+      summary: Updates an existing client.
+      tags:
+        - Clients
+      security:
+        - backendServiceAuthorization: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ClientInput'
+        required: true
+      responses:
+        200:
+          description: The result of the updated client
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Client'
+        400:
+          description: Bad request
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        401:
+          description: Something wrong with the access information verification
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        403:
+          description: Forbidden - the operation is not allowed for the given user on the selected client
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        404:
+          description: Client not found
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /clients/{clientId}/roles:
+    parameters:
+      - in: path
+        name: clientId
+        description: The id of the client
+        required: true
+        schema:
+          type: integer
+          format: int32
+          minimum: 1
+    get:
+      operationId: getClientRoles
+      summary: Gets roles that user is assigned to a given client.
+      security:
+        - backendServiceAuthorization: []
+      tags:
+        - Roles
+      parameters:
+        - name: service
+          in: query
+          required: false
+          description: |
+            Filter roles that has permissions of a given service.
+          schema:
+            $ref: '#/components/schemas/Service'
+      responses:
+        200:
+          description: The result object with list of Roles.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RoleSearchResult'
+    post:
+      operationId: createClientRole
+      summary: Creates a new role for the client.
+      security:
+        - backendServiceAuthorization: []
+      tags:
+        - Roles
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RoleInput'
+        required: true
+      responses:
+        200:
+          description: The result of newly created Role
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Role'
+        400:
+          description: Bad request
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /clients/{clientId}/roles/{roleId}:
+    parameters:
+      - in: path
+        name: clientId
+        description: The id of the client
+        required: true
+        schema:
+          type: integer
+          format: int32
+          minimum: 1
+      - in: path
+        name: roleId
+        description: The id of the role to search for
+        required: true
+        schema:
+          type: integer
+          format: int32
+          minimum: 1
+    delete:
+      operationId: deleteClientRole
+      summary: Deletes a role.
+      security:
+        - backendServiceAuthorization: []
+      tags:
+        - Roles
+      responses:
+        204:
+          description: Role removed succesfully.
+        404:
+          description: Not found.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        403:
+          description: Forbidden - user has no access to the role or the user is missing a delete permission.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    put:
+      operationId: updateClientRole
+      summary: Updates an existing role.
+      security:
+        - backendServiceAuthorization: []
+      tags:
+        - Roles
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RoleInput'
+        required: true
+      responses:
+        200:
+          description: Role updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Role'
+        404:
+          description: Not found.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        403:
+          description: Forbidden - user has no access to the role or the user is missing an update permission.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /clients/{clientId}/roles/{roleId}/permissions:
+    parameters:
+      - in: path
+        name: clientId
+        description: The id of the client
+        required: true
+        schema:
+          type: integer
+          format: int32
+          minimum: 1
+      - in: path
+        name: roleId
+        description: The id of the role to search for
+        required: true
+        schema:
+          type: integer
+          format: int32
+          minimum: 1
+    get:
+      operationId: getRolePermissions
+      summary: Gets the permissions that are linked to this role.
+      security:
+        - backendServiceAuthorization: []
+      tags:
+        - Roles
+      responses:
+        200:
+          description: An object with a list of permissions that are part of this role.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RolePermissionSearchResult'
+    post:
+      operationId: addPermissionToRole
+      summary: Adds the permission to the role.
+      security:
+        - backendServiceAuthorization: []
+      tags:
+        - Roles
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RolePermissionInput'
+        required: true
+      responses:
+        204:
+          description: User added to role succesfully.
+        400:
+          description: Bad request
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /clients/{clientId}/roles/{roleId}/permissions/{permissionId}:
+    parameters:
+      - in: path
+        name: clientId
+        description: The id of the client
+        required: true
+        schema:
+          type: integer
+          format: int32
+          minimum: 1
+      - in: path
+        name: roleId
+        description: The id of the role to search for
+        required: true
+        schema:
+          type: integer
+          format: int32
+          minimum: 1
+      - in: path
+        name: permissionId
+        description: The id of the permission to search for
+        required: true
+        schema:
+          type: integer
+          format: int32
+          minimum: 1
+    delete:
+      operationId: deletePermissionFromRole
+      summary: Removes a permission from the role.
+      security:
+        - backendServiceAuthorization: []
+      tags:
+        - Roles
+      responses:
+        204:
+          description: Permission removed from role succesfully.
+        400:
+          description: Bad request
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        403:
+          description: Forbidden - the operation is not allowed for the given user on the selected client
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /clients/{clientId}/roles/{roleId}/users:
+    parameters:
+      - in: path
+        name: clientId
+        description: The id of the client.
+        required: true
+        schema:
+          type: integer
+          format: int32
+          minimum: 1
+      - in: path
+        name: roleId
+        description: The id of the role to search for.
+        required: true
+        schema:
+          type: integer
+          format: int32
+          minimum: 1
+    get:
+      operationId: getRoleUsers
+      summary: Gets the users that are linked to this role.
+      security:
+        - backendServiceAuthorization: []
+      tags:
+        - Roles
+      parameters:
+        - in: query
+          name: service
+          required: false
+          description: Filters users that have access to the given service.
+          schema:
+            $ref: '#/components/schemas/Service'
+      responses:
+        200:
+          description: An object with a list of users that are part of this role.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RoleUserSearchResult'
+    post:
+      operationId: addUserToRole
+      summary: Gives the user access to the role.
+      security:
+        - backendServiceAuthorization: []
+      tags:
+        - Roles
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserClientRoleInput'
+        required: true
+      responses:
+        204:
+          description: User added to role succesfully.
+        400:
+          description: Bad request
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /clients/{clientId}/roles/{roleId}/users/{username}:
+    parameters:
+      - in: path
+        name: clientId
+        description: The id of the client
+        required: true
+        schema:
+          type: integer
+          format: int32
+          minimum: 1
+      - in: path
+        name: roleId
+        description: The id of the role to search for
+        required: true
+        schema:
+          type: integer
+          format: int32
+          minimum: 1
+      - in: path
+        name: username
+        description: The name of the user
+        required: true
+        schema:
+          type: string
+    delete:
+      operationId: deleteUserFromRole
+      summary: Revokes a user's access to the role.
+      security:
+        - backendServiceAuthorization: []
+      tags:
+        - Roles
+      responses:
+        204:
+          description: User removed from role succesfully.
+        400:
+          description: Bad request
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        403:
+          description: Forbidden - the operation is not allowed for the given user on the selected client.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /clients/{clientId}/users:
+    parameters:
+      - in: path
+        name: clientId
+        description: The id of the client
+        required: true
+        schema:
+          type: integer
+          format: int32
+          minimum: 1
+      - name: omitRoles
+        in: query
+        required: false
+        schema:
+          type: boolean
+          default: false
+        description: |
+          If true, roles will not be part of the response object.
+    get:
+      operationId: getClientUsers
+      summary: Gets users and their roles that are linked to this client.
+      security:
+        - backendServiceAuthorization: []
+      tags:
+        - Users
+      parameters:
+        - in: query
+          name: service
+          required: false
+          description: |
+            Filters users that have access to the given service.
+            If provided, only those roles that have at least one permission of the given service will be returned in the response.
+          schema:
+            $ref: '#/components/schemas/Service'
+      responses:
+        200:
+          description: An object with a list of users that are part of this role.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClientUserSearchResult'
+  /claims:
+    get:
+      operationId: getClaims
+      summary: Gets a list of claims user has on a given client.
+      description: |
+        Endpoint requires accessToken from Auth0.
+        Endpoint does not accept AuthService token.
+      security:
+        - bearerAuth: []
+      tags:
+        - Claims
+      parameters:
+        - name: username
+          in: query
+          required: true
+          schema:
+            type: string
+          description: A user to check the permissions for.
+        - name: service
+          in: query
+          required: true
+          schema:
+            $ref: '#/components/schemas/Service'
+          description: A service to filter permissions by.
+        - name: clientId
+          in: query
+          required: true
+          schema:
+            type: integer
+            format: int32
+          description: Filters claims for a given client and its children.
+        - name: childClientIds
+          in: query
+          required: false
+          schema:
+            type: string
+          description: |
+            A comma separated list of integers.
+            To filter child clients by their id.
+            If provided, only those child clients will be present in the response.
+            If not provided, all children will be present in the response.
+        - name: limit
+          in: query
+          required: false
+          description: |
+            The max number of claims returned. If there are more claims found, an empty result is returned instead.
+            A claim is one permission and one client combination.
+          schema:
+            type: integer
+            format: int32
+            default: 1000
+            maximum: 5000
+        - name: limitSize
+          in: query
+          required: false
+          description: |
+            The max size of the response object in bytes.
+            If response object exceeds the limitSize, an empty result is returned instead.
+          schema:
+            type: integer
+            format: int32
+            default: 7000
+      responses:
+        200:
+          description: |
+            An object with list of claims that a given user has on a given client for a given service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClaimsSearchResult'
+        401:
+          description: Something wrong with the access information verification.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        403:
+          description: Insuficient privileges to call the endpoint.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /permissions:
+    get:
+      operationId: getPermissions
+      summary: Gets a list of permissions user has access to.
+      description: This endpoint will accept a valid access token of any service.
+      security:
+        - backendServiceAuthorization: []
+      tags:
+        - Permissions
+      parameters:
+        - name: service
+          in: query
+          required: false
+          description: |
+            Filter permissions that are of a given service.
+          schema:
+            $ref: '#/components/schemas/Service'
+      responses:
+        200:
+          description: |
+            An object with list of permissions that user has on an active client.
+            Active client is defined in the JWT in the active_client_id claim.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PermissionsSearchResult'
+        401:
+          description: Something wrong with the access information verification
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /services:
+    get:
+      operationId: getServices
+      summary: Gets a list of services user has access to.
+      description: This endpoint will accept a valid access token of any service.
+      security:
+        - backendServiceAuthorization: []
+      tags:
+        - Services
+      responses:
+        200:
+          description: |
+            An object with a list of services that user has access to.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServicesSearchResult'
+
+  /.well-known/jwks.json:
+    get:
+      tags:
+        - Json Web Keys
+      summary: Gets a list of public keys to be used for token validation.
+      operationId: getJWKs
+      responses:
+        200:
+          description: A list of identity providers
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JsonWebKeysResponse'
+        400:
+          description: Internal error when returning jwks.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+components:
+  securitySchemes:
+    backendServiceAuthorization:
+      type: apiKey
+      name: X-Backend-Service-Authorization
+      description: Internal JWT provided by Auth service
+      in: header
+    bearerAuth:
+      type: http
+      scheme: bearer
+      description: JWT provided by Auth0.
+      bearerFormat: JWT
+  schemas:
+    CreateTokenRequest:
+      type: object
+      description: Request object for creating a new tokens.
+      required:
+        - grantType
+      properties:
+        code:
+          type: string
+          description: |
+            authorization_code value. Field is required for exchanging the authorization_code.
+            Applicable only for the AUTHORIZATION_CODE flow.
+          example: jCnFPTn6OyGqBRTW
+        refreshToken:
+          type: string
+          description: |
+            Refresh token that will be used to get new ID tokens. Field is required for exchanging the refreshToken.
+            Applicable only for the REFRESH_TOKEN flow.
+          example: '1GVl7lIregqsX3EoVcnULLxbmw_uhi-UDohWfCwDLSJCq'
+        redirectUrl:
+          type: string
+          description: |
+            A redirect URL that was used to get authorization_code. Required when exchanging the authorization_code.
+            Applicable only for the AUTHORIZATION_CODE flow.
+          example: https://deliverandservice.com/login-callback
+        identityProvider:
+          $ref: '#/components/schemas/IdentityProviderName'
+        clientId:
+          type: integer
+          format: int32
+          description: |
+            The ID of the client that is configured in the Auth Service.
+            If value provided, token will contain permissions of selected client and its child clients that user has access to.
+            If no value provided, no specific client will be selected, access token will have no permissions and no groups.
+          example: 10
+        clientIdAtProvider:
+          type: string
+          description: |
+            The ID of the client that is configured in the Identity Provider. Applicable only for the CLIENT_CREDENTIALS flow.
+          example: cb003510-79b5-4255-b838-6843c22087fe
+        clientSecretAtProvider:
+          type: string
+          description: |
+            The client secret that is configured on Identity Provider. Applicable only for the CLIENT_CREDENTIALS flow.
+          example: Heb_BbllJigza7iGlHUaPwcXJzmyhHWySaIkBzzuEV3y4P_B9q9_bQGWqgwewmg3
+        grantType:
+          $ref: '#/components/schemas/GrantType'
+        service:
+          $ref: '#/components/schemas/Service'
+        maxNumberOfTokens:
+          deprecated: true
+          type: integer
+          format: int32
+          minimum: 0
+          maximum: 20
+          description: |
+            Limits how many access tokens are returned in the response.
+            This field will exist temporally for migration purposes.
+        longLived:
+          type: boolean
+          description: |
+            Indicates if token should have expiration date far in the future.
+            Token will be valid for 12 months.
+            Applicable only for the CLIENT_CREDENTIALS flow.
+    TokenResult:
+      type: object
+      properties:
+        idToken:
+          type: string
+          description: |
+            The ID token that contains details about the user. Value is empty on CLIENT_CREDENTIALS flow.
+        accessTokens:
+          type: array
+          description: The list of access tokens to use for subsequent requests in the given services
+          items:
+            $ref: '#/components/schemas/AccessToken'
+        refreshToken:
+          type: string
+          description: The refresh token used to refresh the id tokens
+          example: '1GVl7lIregqsX3EoVcnULLxbmw_uhi-UDohWfCwDLSJCq'
+        expiresIn:
+          type: integer
+          description: The period in seconds that the id token is valid for from the moment it was issued
+          example: 86400
+      description: The result of the create token operation
+    AccessToken:
+      type: object
+      description: Access token related to a specific service
+      properties:
+        token:
+          type: string
+          description: Base64 encoded JWT
+          example: |
+            eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
+        service:
+          $ref: '#/components/schemas/Service'
+    Service:
+      type: string
+      description: A single or a group of services (applications) available
+      enum:
+        - AUTH
+        - CAHUB
+        - CDL
+        - INTEGRATION_PLATFORM
+        - KASKAD
+        - SBSMANAGER
+        - DSMLH
+        - ORDEXE
+        - PICKING_CAPACITY
+        - PUPMGR
+        - IN_STORE_PICKING
+        - WOMGR
+        - FMSRR
+    GetIdentityProvidersResponse:
+      type: object
+      properties:
+        identityProviders:
+          type: array
+          description: List of identity providers
+          items:
+            $ref: '#/components/schemas/IdentityProvider'
+    IdentityProvider:
+      type: object
+      properties:
+        authorizationEndpoint:
+          type: string
+          description: The fully qualified URL of the server’s authorization endpoint defined by RFC 6749
+          example: |
+            https://auth0.com/authorize?redirect_uri=https://deliverandservice.com/login-callback&client_id=some-client&response_type=code&scope=openid%20profile%20
+        name:
+          $ref: '#/components/schemas/IdentityProviderName'
+      description: Represents an identity provider that can be used to authenticate.
+    JsonWebKeysResponse:
+      type: object
+      properties:
+        keys:
+          type: array
+          description: List of public keys
+          items:
+            type: object
+    IdentityProviderName:
+      type: string
+      description: Identity providers that are available in the system
+      example: AUTH0
+      enum:
+        - AUTH0
+    GrantType:
+      type: string
+      description: |
+        Application grant type (or flow) is a method through which you want to gain JWT Tokens.
+      example: AUTHORIZATION_CODE
+      default: AUTHORIZATION_CODE
+      enum:
+        - AUTHORIZATION_CODE
+        - CLIENT_CREDENTIALS
+        - REFRESH_TOKEN
+    GetTokensResponse:
+      type: object
+      description: A result object for getting tokens information.
+      properties:
+        tokens:
+          type: array
+          description: List of tokens information
+          items:
+            $ref: '#/components/schemas/IdTokenInfo'
+    IdTokenInfo:
+      type: object
+      description: Information about an ID token. Does not contain an actual token.
+      properties:
+        id:
+          type: string
+          description: Unique token id
+          example: LS0tLS1CRUdJTiBQUklWQVRFIEtFWS0t
+        service:
+          $ref: '#/components/schemas/Service'
+        clientIdAtProvider:
+          type: string
+          description: Client ID defined by the provider
+          example: LS0tLS1CRUdJTiBQUklWQVRFIEtFWS0t
+        permissions:
+          type: array
+          description: List of permissions that token contains.
+          items:
+            type: string
+        issueDate:
+          type: 'string'
+          description: 'The date-time when the token was created'
+        expiryDate:
+          type: 'string'
+          description: 'The date-time when the token will expire'
+    ClientBase:
+      type: object
+      description: Represents client fields that can be managed by the user and be returned in the response.
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          description: The name of the client.
+          minLength: 1
+          maxLength: 100
+        externalReference:
+          type: string
+          description: Unique identifier of the client in the system (e.g. CBD) it originated from (e.g. STO002).
+          minLength: 1
+          maxLength: 100
+    ClientInput:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/ClientBase'
+      description: Represents client fields that can be managed by the user.
+      properties:
+        parentClientId:
+          type: integer
+          format: int32
+          description: |
+            The ID of the parent client. Must not be empty when creating a new client or when updating a non PLATFORM
+            client.
+        parentClientRelationType:
+          $ref: '#/components/schemas/ClientHierarchyType'
+    Client:
+      type: object
+      description: |
+        Represents a client.
+      allOf:
+        - $ref: '#/components/schemas/ClientBase'
+      properties:
+        id:
+          type: integer
+          format: int32
+          description: The ID of the client.
+        clientType:
+          $ref: '#/components/schemas/ClientType'
+        parentClients:
+          type: array
+          items:
+            $ref: '#/components/schemas/ParentClient'
+    ParentClient:
+      type: object
+      description: Represents a parent client in relation to its child.
+      allOf:
+        - $ref: '#/components/schemas/ClientBase'
+      properties:
+        id:
+          type: integer
+          format: int32
+          description: The ID of the client.
+        clientHierarchyType:
+          $ref: '#/components/schemas/ClientHierarchyType'
+    ClientType:
+      type: string
+      description: Indicates the type of the client within the client hierarchy.
+      enum:
+        - ACCOUNT
+        - TENANT
+        - PLATFORM_OWNER
+    ClientHierarchyType:
+      type: string
+      description: Indicates the type of the hierarchy two clients are related by.
+      default: GEOGRAPHICAL
+      enum:
+        - GEOGRAPHICAL
+    ClientSearchResult:
+      type: object
+      properties:
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Client'
+        total:
+          type: integer
+          format: int64
+          description: Total search count
+    RoleInput:
+      type: object
+      description: |
+        Represents role fields that can be managed by the user.
+      required:
+        - name
+        - clientHierarchyType
+      properties:
+        name:
+          type: string
+          description: The name of the role.
+        clientHierarchyType:
+          $ref: '#/components/schemas/ClientHierarchyType'
+        description:
+          type: string
+          description: The description of the role.
+    RolePermissionInput:
+      type: object
+      description: |
+        Represents permission id and a scope that Client Role should contain.
+      properties:
+        permissionId:
+          type: integer
+          format: int32
+          description: The ID of the permission.
+        scope:
+          $ref: '#/components/schemas/PermissionScope'
+    Role:
+      description: |
+        Represents a role associated with a client.
+      allOf:
+        - $ref: '#/components/schemas/RoleInput'
+      properties:
+        id:
+          type: integer
+          format: int32
+          description: The ID of the role.
+        type:
+          $ref: '#/components/schemas/RoleType'
+        permissions:
+          type: array
+          description: Permissions that this role contains.
+          items:
+            $ref: '#/components/schemas/RolePermission'
+    PermissionScope:
+      type: string
+      description: |
+        Determines the scope of the permission.
+        When set to CHILDREN, the permission's scope extends to the child clients of the client that the role
+        belongs to.
+        When set to LOCAL, the permission's scope is only within the client that the role belongs to.
+      enum:
+        - LOCAL
+        - CHILDREN
+    UserClientRoleInput:
+      type: object
+      description: Input to assign Role to a user
+      properties:
+        username:
+          type: string
+          description: The username of the user
+    User:
+      type: object
+      description: Represents a user.
+      properties:
+        username:
+          type: string
+          description: The username of the user
+    RoleSearchResult:
+      type: object
+      properties:
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Role'
+        total:
+          type: integer
+          description: Total search count
+    RolePermissionSearchResult:
+      type: object
+      properties:
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/RolePermission'
+        total:
+          type: integer
+          description: Total search count
+    RolePermission:
+      allOf:
+        - $ref: '#/components/schemas/Permission'
+      properties:
+        scope:
+          $ref: '#/components/schemas/PermissionScope'
+    RoleUserSearchResult:
+      type: object
+      properties:
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/User'
+        total:
+          type: integer
+          description: Total search count
+    ClientUserSearchResult:
+      type: object
+      properties:
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserRole'
+        total:
+          type: integer
+          description: Total search count
+    UserRole:
+      type: object
+      properties:
+        user:
+          $ref: '#/components/schemas/User'
+        roles:
+          type: array
+          items:
+            $ref: '#/components/schemas/Role'
+    RoleType:
+      type: string
+      description: Role type
+      enum:
+        - PREDEFINED
+        - CUSTOM
+    PermissionsSearchResult:
+      type: object
+      properties:
+        results:
+          type: array
+          deprecated: true
+          items:
+            $ref: '#/components/schemas/Permission'
+        newResults:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserPermission'
+        total:
+          type: integer
+          description: Total search count
+    ServicesSearchResult:
+      type: object
+      properties:
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Service'
+        total:
+          type: integer
+          description: Total search count
+    Permission:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+          description: The ID of the permission.
+        name:
+          type: string
+          description: Machine name of the permission
+          example: token.get
+        description:
+          type: string
+          description: A short, human readable name of the permission
+          example: Get tokens
+        service:
+          $ref: '#/components/schemas/Service'
+    UserPermission:
+      type: object
+      properties:
+        permission:
+          $ref: '#/components/schemas/Permission'
+        hasAuthority:
+          type: boolean
+          description: Indicates if the bearer of the token has a given permission on currently active client.
+    PermissionFilterType:
+      type: string
+      description: A type on which the permission filter will be applied
+      enum:
+        - ANY
+        - ALL
+    HierarchicallyFilterType:
+      type: string
+      description: A type on which the hierarchical filter will be applied
+      enum:
+        - CHILDREN
+        - PARENTS
+    ClaimsSearchResult:
+      type: object
+      properties:
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/ClientPermissionClaim'
+    ClientPermissionClaim:
+      type: object
+      properties:
+        p:
+          type: string
+          description: Permission name.
+        c:
+          type: array
+          description: List of client ids that user has access with a given permission.
+          items:
+            type: integer
+            format: int32
+    ErrorResponse:
+      type: object
+      properties:
+        type:
+          type: string
+          format: uri
+          description: |
+            An absolute URI that identifies the problem type. When dereferenced,
+            it SHOULD provide human-readable documentation for the problem type
+            (e.g., using HTML).
+          default: 'about:blank'
+          example: 'https://example.com/probs/out-of-credit'
+        title:
+          type: string
+          description: |
+            A short, summary of the problem type. Written in english and readable
+            for engineers (usually not suited for non technical stakeholders and
+            not localized);
+          example: You do not have enough credit.
+        timestamp:
+          type: string
+          description: The date-time when the error occurred
+        status:
+          type: integer
+          format: int32
+          description: |
+            The HTTP status code generated by the origin server for this occurrence
+            of the problem.
+          minimum: 100
+          maximum: 600
+          exclusiveMaximum: true
+          example: 503
+        detail:
+          type: string
+          description: |
+            A human readable explanation specific to this occurrence of the
+            problem.
+          example: Your current balance is 30, but that costs 50.
+        instance:
+          type: string
+          format: uri
+          description: |
+            An absolute URI that identifies the specific occurrence of the problem.
+            It may or may not yield further information if dereference.
+          example: /account/12345/msgs/abc
+        invalidParams:
+          type: array
+          description: A collection of invalid parameters
+          items:
+            $ref: '#/components/schemas/InvalidParameter'
+      description: An error thrown by the API
+    InvalidParameter:
+      type: object
+      description: |
+        Details about an error, usually specific to a field in the POST or PUT request.
+      properties:
+        reason:
+          type: string
+          description: A detailed error message
+          example: Must be a positive integer
+        name:
+          type: string
+          description: The name of the parameter that caused the error
+          example: age

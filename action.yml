@@ -1,0 +1,11 @@
+name: 'Lint OpenAPI Action'
+description: 'Use lint-openapi in GitHub Actions'
+inputs:
+  files:
+    required: true
+    description: 'Paths to files to lint'
+  shouldApplyGatewayRules:
+    description: 'A boolean indicating whether to additionally validate against the Kong Gateway rules or not'
+runs:
+  using: 'node16'
+  main: 'dist/index.js'
