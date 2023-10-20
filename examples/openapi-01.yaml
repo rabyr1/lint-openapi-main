@@ -13,6 +13,7 @@ tags:
 - name: iSOM Get Order Info API
   description: iSOM Get Order Info API
 servers:
+  DEV:
   - url: https://api.ingka.cte.ikeadt.com/om/order-management/eu/get-order-info
 paths:
   /{region}/get-order-info:
@@ -33,7 +34,7 @@ paths:
         required: true
         schema:
             type: string
-      - in: body
+      - in: path
         name: Get Order Info Service
         description: Request to get order info
         required: true
@@ -42,12 +43,17 @@ paths:
       responses:
         "200":
           description: Response to get order Info
-          schema:
-            $ref: '#/components/getOrderInfoResponse'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/getOrderInfoResponse'
         "400":
           description: Failed processing
-          schema:
-            $ref: '#/components/getOrderInfoErrorResponse'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/getOrderInfoErrorResponse'
+          
 components:
   getOrderInfoRequest:
     type: object
