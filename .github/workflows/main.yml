@@ -30,4 +30,4 @@ jobs:
             examples/openapi-01.yaml
             examples/openapi-03.yaml
             examples/openapi-04.yaml
-          # shouldApplyGatewayRules: true
+            shouldApplyGatewayRules: true
