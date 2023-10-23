@@ -55,13 +55,11 @@ paths:
 components:
   requestBodies:
     getOrderInfoRequest:
-      type: object
-      properties:
-        orderHeaderKey:
-           type: string
-           format: 'nonNegativeInteger (total number of digits: 24)'
-           example: '20200904175504198948'
-           description: Unique key of the iSOM order.
+      content:
+        application/json:
+           schema:
+            $ref: "#/components/schemas/OrderHeaderKey"         
+      
   schemas:
 
     getOrderInfoResponse:
@@ -69,6 +67,16 @@ components:
       properties:
         orderList:
           $ref: '#/components/getOrderInfoResponse_orderList'
+    OrderHeaderKey:
+      type: object
+      required:
+        - orderHeaderKey
+      properties:
+        orderHeaderKey:
+           type: string
+           format: 'nonNegativeInteger (total number of digits: 24)'
+           example: '20200904175504198948'
+           description: Unique key of the iSOM order.  
     getOrderInfoErrorResponse:
       type: object
       properties:
