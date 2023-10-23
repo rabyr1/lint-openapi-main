@@ -14,9 +14,11 @@ tags:
   description: iSOM Get Order Info API
 servers:
   - url: https://api.ingka.cte.ikeadt.com/om/order-management/eu/get-order-info
-    description: DEV 
+    description: API Gateway DEV 
+  - url: https://api.ingka.ikea.com/om/order-management/eu/get-order-info
+    description: API Gateway PROD
   - url: https://api.ingka.ppe.ikeadt.com/om/order-management/eu/get-order-info
-    description: DEV   
+    description: API Gateway STAGE
 paths:
   "/{region}/get-order-info":
     post:
@@ -531,4 +533,10 @@ components:
             format: 'maximum length: 150'
             description: TSP Name from centiro for Cust Returns
             example: TSPName  
- 
+  securitySchemes:
+    Authorization:
+      type: string
+      in: header
+      name: Bearer          
+security:
+  - Authorization: []
