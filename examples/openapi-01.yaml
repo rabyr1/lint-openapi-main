@@ -145,378 +145,378 @@ components:
           $ref: '#/components/orders/order_personInfoBillTo'
         shipmentList:
           $ref: '#/components/orders/order_shipmentList'
-      order_extn:
-        type: object
-        required:
-        - preferredCommunicationMethod
-        - preferredLanguage
-        properties:
-          preferredLanguage:
-            type: string
-            format: 'maximum length: 40'
-            example: en
-            description: preferredLanguage
-          preferredCommunicationMethod:
-            type: string
-            format: 'maximum length: 40'
-            example: EMAIL/SMS
-            description: Customer's preferred communication method
-      order_orderLines:
-        type: object
-        required:
-        - orderLine
-        properties:
-          orderLine:
-            $ref: '#/components/orders/order_orderLines_orderLine'
-      order_orderLines_orderLine:
-        type: array
-        items:
-          $ref: '#/components/orders/orderLine'
-      orderLine:
-        type: object
-        required:
-        - itemDetails
-        - orderLineKey
-        - shipNode
-        - workOrders
-        properties:
-          orderLineKey:
-            type: integer
-            format: 'nonNegativeInteger (total number of digits: 24)'
-            example: 221120202345756576
-            description: Unique key for the order line
-          shipNode:
-            type: string
-            format: 'maximum length: 24'
-            example: CDC.001
-            description: Ship node id from where line is getting fulfilled
-          itemDetails:
-            $ref: '#/components/orders/order_orderLines_orderLine_itemDetails'
-          workOrders:
-            $ref: '#/components/orders/order_orderLines_orderLine_workOrders'
-        description: Contains orderline information.
-      order_orderLines_orderLine_itemDetails:
-        type: object
-        required:
-        - extn
-        - itemID
-        properties:
-          itemID:
-            type: string
-            format: 'maximum length: 40'
-            example: ART20350182/SGR40400001
-            description: Unique id of the orderLine item.
-          extn:
-            $ref: '#/components/orders/order_orderLines_orderLine_itemDetails_extn'
-        description: Contains orderLine item information.
-      order_orderLines_orderLine_itemDetails_extn:
-        type: object
-        properties:
-          itemID:
-            type: string
-            format: 'maximum length: 40'
-            example: TRUCK/PARCEL
-            description: Unique id of the orderLine item.
-        description: Contains orderLine item information.
-      order_orderLines_orderLine_workOrders:
-        type: object
-        required:
-        - workOrder
-        properties:
-          workOrder:
-            $ref: '#/components/orders/order_orderLines_orderLine_WOs_WO'
-        description: Contains list of workOrders.
-      order_orderLines_orderLine_WOs_WO:
-        type: array
-        items:
-          $ref: '#/components/orders/workOrder'
-      workOrder:
-        type: object
-        required:
-        - nodeKey
-        - promisedApptEndDate
-        - promisedApptStartDate
-        - providerOrganizationCode
-        - timezone
-        - workOrderNo
-        properties:
-          nodeKey:
-            type: string
-            format: 'maximum length: 24'
-            example: LSC.258
-            description: This is the node where prod lines are merged before final delivery
-          promisedApptStartDate:
-            type: string
-            format: dateTime
-            example: 2020-08-12T16:00:00.000Z
-            description: The date and time when the appointment starts for an OrderLine.This date only applies to both Delivery (ItemGroupCode=DS) and Provided (ItemGroupCode=PS) lines for ISOM.
-          promisedApptEndDate:
-            type: string
-            format: dateTime
-            example: 2020-08-12T07:00:00.000Z
-            description: The date and time when the appointment ends for an OrderLine. This date only applies to Delivery  (ItemGroupCode=DS) and Provided (ItemGroupCode=PS) lines for ISOM.
-          providerOrganizationCode:
-            type: string
-            format: 'maximum length: 24'
-            example: "4201022"
-            description: Transport service provider unique code
-          timezone:
-            type: string
-            format: 'maximum length: 40'
-            example: Europe/London
-            description: The timezone in which the promised appointment has been recorded. This attribute only applies to  Provided (ItemGroupCode=PS) and  (ItemGroupCode=DS) lines.
-          workOrderNo:
-            type: string
-            format: 'maximum length: 40'
-            example: "4201022"
-            description: Number of the work order associated to the order line.
-          extn:
-            $ref: '#/components/orders/workOrder_extn'  
-        description: Contains work order information associated to the order line.
-      order_orderLineRelationships:
-        type: object
-        required:
-        - orderLineRelationship
-        properties:
-          orderLineRelationship:
-            $ref: '#/components/orders/order_orderLineRelationships_orderLineRelationship'
-        description: The type of relationship between the parent and the child line.
-      order_orderLineRelationships_orderLineRelationship:
-        type: array
-        items:
-          $ref: '#/components/orders/orderLineRelationship'
-      orderLineRelationship:
-        type: object
-        required:
-        - childLine
-        - parentLine
-        - relationshipType
-        properties:
-          relationshipType:
-            type: string
-            format: 'maximum length: 40'
-            example: DELIVERY / SERVICE
-            description: The type of relationship between order lines.
-          parentLine:
-            $ref: '#/components/orders/orderLineRelationship_parentLine'
-          childLine:
-            $ref: '#/components/orders/orderLineRelationship_childLine'
-        description: The type of relationship between the parent and the child line.
-      order_personInfoShipTo:
-        type: object
-        required:
-        - country
-        properties:
-          eMailID:
-            type: string
-            format: 'maximum length: 150'
-            example: ' abc.xyz@ingka.com'
-            description: email ID
-          country:
-            type: string
-            format: 'maximum length: 40'
-            example: GB
-            description: The country in the address.
-          firstName:
-            type: string
-            format: 'maximum length: 64'
-            example: First Name
-            description: The first name of the person.
-          lastName:
-            type: string
-            format: 'maximum length: 64'
-            example: lastName
-            description: The last name of the person.
-          middleName:
-            type: string
-            format: 'maximum length: 40'
-            example: middleName
-            description: The middle name of the person.
-          dayPhone:
-            type: string
-            format: 'maximum length: 40'
-            example: +344544444
-            description: The day time phone at which the person or organization referred to in the address can be called.
-          eveningPhone:
-            type: string
-            format: 'maximum length: 30'
-            example: +344544444
-            description: The evening time phone at which the person or organization referred to in the address can be called.
-          mobilePhone:
-            type: string
-            format: 'maximum length: 40'
-            example: +344544445
-            description: The mobile phone at which the person or a predesignated employee of the organization referred to in the address can be called.
-          otherPhone:
-            type: string
-            format: 'maximum length: 40'
-            example: +344544444
-            description: The alternate phone number at which the person or a predesignated employee of the organization referred to in the address can be called.
-          extn:
-            $ref: '#/components/orders/order_personInfoShipTo_extn'
-        description: personInfoShipTo details
-      order_personInfoShipTo_extn:
-        type: object
-        properties:
-          globalCustomerId:
-            type: string
-            format: 'maximum length: 100'
-            description: globalCustomerId
-      order_shipmentList:
-        type: object
-        required:
-        - totalNumberOfRecords
-        - shipment
-        properties:
-          totalNumberOfRecords:
-            type: string
-            format: 'maximum length: 5'
-            example: 1
-            description: Number of shipments created for the orders.
-          shipment:
-            $ref: '#/components/orders/order_shipmentList_shipment'
-            description: Shipment created for the order.It is optional. When source is OrderInfo in request,then this value will be retrieved    
-          extn:
-            $ref: '#/components/orders/order_shipmentList_extn'
-            description: shipments details.
-      order_shipmentList_shipment:
-        type: object
-        required:
-         - totalQuantity
-         - shipmentNo
-        properties:
-          totalQuantity:
-            type: string
-            format: 'maximum length: 5'
-            example: 10
-            description: total quantity of the shipments.
-          shipmentNo:
-            type: string
-            format: 'maximum length: 5'
-            example: 1
-            description: Number of shipments created for the orders.
-          shipmentLines:
-            $ref: '#/components/orders/order_shipmentList_shipment_shipmentLines'
-            description: Shipments lines created for the workorder.
-      order_shipmentList_extn:
-        type: object
-        required:
-         - cduID
-         - quantity
-        properties:
-          cduID:
-            type: string
-            format: 'maximum length: 40'
-            example: 110505175
-            description: CduId number
-          quantity:
-            type: string
-            format: 'maximum length: 40'
-            example: 5.00
-            description: Quantity of the shipments
-      order_shipmentList_shipment_shipmentLines:
-        type: object
-        required:
-        - shipmentLine
-        properties:
-          shipmentLine:
-            type: object
-            $ref: '#/components/orders/order_shipmentList_shipment_shipmentLines_shipmentLine'
-      order_shipmentList_shipment_shipmentLines_shipmentLine:	
-        type: object
-        required:
-         - primeLineNo
-         - quantity
-         - orderLineKey
-        properties:
-          primeLineNo:
-            type: string
-            format: 'maximum length: 40'
-            example: 1
-            description: Shipmentlines created corresponding to prod orderlines.
-          quantity:
-            type: string
-            format: 'maximum length: 40'
-            example: 2.00
-            description: The type of relationship between order lines.
-          orderLineKey:
-            type: string
-            format: 'maximum length: 40'
-            example: 202202170936171501188787
-            description: orderLineKey id.
-      order_personInfoBillTo:
-        type: object
-        required:
-        - country
-        - firstName
-        - lastName
-        properties:
-          eMailID:
-            type: string
-            format: 'maximum length: 150'
-            example: ' abc.xyz@ingka.com'
-            description: email ID
-          country:
-            type: string
-            format: 'maximum length: 40'
-            example: GB
-            description: The country in the address.
-          firstName:
-            type: string
-            format: 'maximum length: 64'
-            example: First Name
-            description: The first name of the person.
-          lastName:
-            type: string
-            format: 'maximum length: 64'
-            example: lastName
-            description: The last name of the person.
-          middleName:
-            type: string
-            format: 'maximum length: 40'
-            example: middleName
-            description: The middle name of the person.
-          dayPhone:
-            type: string
-            format: 'maximum length: 40'
-            example: +344544444
-            description: The day time phone at which the person or organization referred to in the address can be called.
-          eveningPhone:
-            type: string
-            format: 'maximum length: 30'
-            example: +344544444
-            description: The evening time phone at which the person or organization referred to in the address can be called.
-          mobilePhone:
-            type: string
-            format: 'maximum length: 40'
-            example: +344544445
-            description: The mobile phone at which the person or a predesignated employee of the organization referred to in the address can be called.
-          otherPhone:
-            type: string
-            format: 'maximum length: 40'
-            example: +344544444
-            description: The alternate phone number at which the person or a predesignated employee of the organization referred to in the address can be called.
-      orderLineRelationship_parentLine:
-        type: object
-        required:
-        - orderLineKey
-        properties:
-          orderLineKey:
-            type: integer
-            format: 'nonNegativeInteger (total number of digits: 24)'
-            example: 221120202345756576
-            description: The parent order line number.
-        description: Parent orderLine.
-      orderLineRelationship_childLine:
-        type: object
-        properties:
-          primeLineNo:
-            type: integer
-            format: 'nonNegativeInteger (total number of digits: 24)'
-            example: 221120202345756576
-            description: The child order line number.
-        description: Child orderLine.
-      workOrder_extn:
+    order_extn:
+      type: object
+      required:
+      - preferredCommunicationMethod
+      - preferredLanguage
+      properties:
+        preferredLanguage:
+          type: string
+          format: 'maximum length: 40'
+          example: en
+          description: preferredLanguage
+        preferredCommunicationMethod:
+          type: string
+          format: 'maximum length: 40'
+          example: EMAIL/SMS
+          description: Customer's preferred communication method
+    order_orderLines:
+      type: object
+      required:
+      - orderLine
+      properties:
+        orderLine:
+          $ref: '#/components/schemas/order_orderLines_orderLine'
+    order_orderLines_orderLine:
+      type: array
+      items:
+        $ref: '#/components/schemas/orderLine'
+    orderLine:
+      type: object
+      required:
+      - itemDetails
+      - orderLineKey
+      - shipNode
+      - workOrders
+      properties:
+        orderLineKey:
+          type: integer
+          format: 'nonNegativeInteger (total number of digits: 24)'
+          example: 221120202345756576
+          description: Unique key for the order line
+        shipNode:
+          type: string
+          format: 'maximum length: 24'
+          example: CDC.001
+          description: Ship node id from where line is getting fulfilled
+        itemDetails:
+          $ref: '#/components/orders/order_orderLines_orderLine_itemDetails'
+        workOrders:
+          $ref: '#/components/orders/order_orderLines_orderLine_workOrders'
+      description: Contains orderline information.
+    order_orderLines_orderLine_itemDetails:
+      type: object
+      required:
+      - extn
+      - itemID
+      properties:
+        itemID:
+          type: string
+          format: 'maximum length: 40'
+          example: ART20350182/SGR40400001
+          description: Unique id of the orderLine item.
+        extn:
+          $ref: '#/components/orders/order_orderLines_orderLine_itemDetails_extn'
+      description: Contains orderLine item information.
+    order_orderLines_orderLine_itemDetails_extn:
+      type: object
+      properties:
+        itemID:
+          type: string
+          format: 'maximum length: 40'
+          example: TRUCK/PARCEL
+          description: Unique id of the orderLine item.
+      description: Contains orderLine item information.
+    order_orderLines_orderLine_workOrders:
+      type: object
+      required:
+      - workOrder
+      properties:
+        workOrder:
+          $ref: '#/components/orders/order_orderLines_orderLine_WOs_WO'
+      description: Contains list of workOrders.
+    order_orderLines_orderLine_WOs_WO:
+      type: array
+      items:
+        $ref: '#/components/orders/workOrder'
+    workOrder:
+      type: object
+      required:
+      - nodeKey
+      - promisedApptEndDate
+      - promisedApptStartDate
+      - providerOrganizationCode
+      - timezone
+      - workOrderNo
+      properties:
+        nodeKey:
+          type: string
+          format: 'maximum length: 24'
+          example: LSC.258
+          description: This is the node where prod lines are merged before final delivery
+        promisedApptStartDate:
+          type: string
+          format: dateTime
+          example: 2020-08-12T16:00:00.000Z
+          description: The date and time when the appointment starts for an OrderLine.This date only applies to both Delivery (ItemGroupCode=DS) and Provided (ItemGroupCode=PS) lines for ISOM.
+        promisedApptEndDate:
+          type: string
+          format: dateTime
+          example: 2020-08-12T07:00:00.000Z
+          description: The date and time when the appointment ends for an OrderLine. This date only applies to Delivery  (ItemGroupCode=DS) and Provided (ItemGroupCode=PS) lines for ISOM.
+        providerOrganizationCode:
+          type: string
+          format: 'maximum length: 24'
+          example: "4201022"
+          description: Transport service provider unique code
+        timezone:
+          type: string
+          format: 'maximum length: 40'
+          example: Europe/London
+          description: The timezone in which the promised appointment has been recorded. This attribute only applies to  Provided (ItemGroupCode=PS) and  (ItemGroupCode=DS) lines.
+        workOrderNo:
+          type: string
+          format: 'maximum length: 40'
+          example: "4201022"
+          description: Number of the work order associated to the order line.
+        extn:
+          $ref: '#/components/orders/workOrder_extn'  
+      description: Contains work order information associated to the order line.
+    order_orderLineRelationships:
+      type: object
+      required:
+      - orderLineRelationship
+      properties:
+        orderLineRelationship:
+          $ref: '#/components/orders/order_orderLineRelationships_orderLineRelationship'
+      description: The type of relationship between the parent and the child line.
+    order_orderLineRelationships_orderLineRelationship:
+      type: array
+      items:
+        $ref: '#/components/orders/orderLineRelationship'
+    orderLineRelationship:
+      type: object
+      required:
+      - childLine
+      - parentLine
+      - relationshipType
+      properties:
+        relationshipType:
+          type: string
+          format: 'maximum length: 40'
+          example: DELIVERY / SERVICE
+          description: The type of relationship between order lines.
+        parentLine:
+          $ref: '#/components/orders/orderLineRelationship_parentLine'
+        childLine:
+          $ref: '#/components/orders/orderLineRelationship_childLine'
+      description: The type of relationship between the parent and the child line.
+    order_personInfoShipTo:
+      type: object
+      required:
+      - country
+      properties:
+        eMailID:
+          type: string
+          format: 'maximum length: 150'
+          example: ' abc.xyz@ingka.com'
+          description: email ID
+        country:
+          type: string
+          format: 'maximum length: 40'
+          example: GB
+          description: The country in the address.
+        firstName:
+          type: string
+          format: 'maximum length: 64'
+          example: First Name
+          description: The first name of the person.
+        lastName:
+          type: string
+          format: 'maximum length: 64'
+          example: lastName
+          description: The last name of the person.
+        middleName:
+          type: string
+          format: 'maximum length: 40'
+          example: middleName
+          description: The middle name of the person.
+        dayPhone:
+          type: string
+          format: 'maximum length: 40'
+          example: +344544444
+          description: The day time phone at which the person or organization referred to in the address can be called.
+        eveningPhone:
+          type: string
+          format: 'maximum length: 30'
+          example: +344544444
+          description: The evening time phone at which the person or organization referred to in the address can be called.
+        mobilePhone:
+          type: string
+          format: 'maximum length: 40'
+          example: +344544445
+          description: The mobile phone at which the person or a predesignated employee of the organization referred to in the address can be called.
+        otherPhone:
+          type: string
+          format: 'maximum length: 40'
+          example: +344544444
+          description: The alternate phone number at which the person or a predesignated employee of the organization referred to in the address can be called.
+        extn:
+          $ref: '#/components/orders/order_personInfoShipTo_extn'
+      description: personInfoShipTo details
+    order_personInfoShipTo_extn:
+      type: object
+      properties:
+        globalCustomerId:
+          type: string
+          format: 'maximum length: 100'
+          description: globalCustomerId
+    order_shipmentList:
+      type: object
+      required:
+      - totalNumberOfRecords
+      - shipment
+      properties:
+        totalNumberOfRecords:
+          type: string
+          format: 'maximum length: 5'
+          example: 1
+          description: Number of shipments created for the orders.
+        shipment:
+          $ref: '#/components/orders/order_shipmentList_shipment'
+          description: Shipment created for the order.It is optional. When source is OrderInfo in request,then this value will be retrieved    
+        extn:
+          $ref: '#/components/orders/order_shipmentList_extn'
+          description: shipments details.
+    order_shipmentList_shipment:
+      type: object
+      required:
+       - totalQuantity
+       - shipmentNo
+      properties:
+        totalQuantity:
+          type: string
+          format: 'maximum length: 5'
+          example: 10
+          description: total quantity of the shipments.
+        shipmentNo:
+          type: string
+          format: 'maximum length: 5'
+          example: 1
+          description: Number of shipments created for the orders.
+        shipmentLines:
+          $ref: '#/components/orders/order_shipmentList_shipment_shipmentLines'
+          description: Shipments lines created for the workorder.
+    order_shipmentList_extn:
+      type: object
+      required:
+       - cduID
+       - quantity
+      properties:
+        cduID:
+          type: string
+          format: 'maximum length: 40'
+          example: 110505175
+          description: CduId number
+        quantity:
+          type: string
+          format: 'maximum length: 40'
+          example: 5.00
+          description: Quantity of the shipments
+    order_shipmentList_shipment_shipmentLines:
+      type: object
+      required:
+      - shipmentLine
+      properties:
+        shipmentLine:
+          type: object
+          $ref: '#/components/orders/order_shipmentList_shipment_shipmentLines_shipmentLine'
+    order_shipmentList_shipment_shipmentLines_shipmentLine:	
+      type: object
+      required:
+       - primeLineNo
+       - quantity
+       - orderLineKey
+      properties:
+        primeLineNo:
+          type: string
+          format: 'maximum length: 40'
+          example: 1
+          description: Shipmentlines created corresponding to prod orderlines.
+        quantity:
+          type: string
+          format: 'maximum length: 40'
+          example: 2.00
+          description: The type of relationship between order lines.
+        orderLineKey:
+          type: string
+          format: 'maximum length: 40'
+          example: 202202170936171501188787
+          description: orderLineKey id.
+    order_personInfoBillTo:
+      type: object
+      required:
+      - country
+      - firstName
+      - lastName
+      properties:
+        eMailID:
+          type: string
+          format: 'maximum length: 150'
+          example: ' abc.xyz@ingka.com'
+          description: email ID
+        country:
+          type: string
+          format: 'maximum length: 40'
+          example: GB
+          description: The country in the address.
+        firstName:
+          type: string
+          format: 'maximum length: 64'
+          example: First Name
+          description: The first name of the person.
+        lastName:
+          type: string
+          format: 'maximum length: 64'
+          example: lastName
+          description: The last name of the person.
+        middleName:
+          type: string
+          format: 'maximum length: 40'
+          example: middleName
+          description: The middle name of the person.
+        dayPhone:
+          type: string
+          format: 'maximum length: 40'
+          example: +344544444
+          description: The day time phone at which the person or organization referred to in the address can be called.
+        eveningPhone:
+          type: string
+          format: 'maximum length: 30'
+          example: +344544444
+          description: The evening time phone at which the person or organization referred to in the address can be called.
+        mobilePhone:
+          type: string
+          format: 'maximum length: 40'
+          example: +344544445
+          description: The mobile phone at which the person or a predesignated employee of the organization referred to in the address can be called.
+        otherPhone:
+          type: string
+          format: 'maximum length: 40'
+          example: +344544444
+          description: The alternate phone number at which the person or a predesignated employee of the organization referred to in the address can be called.
+    orderLineRelationship_parentLine:
+      type: object
+      required:
+      - orderLineKey
+      properties:
+        orderLineKey:
+          type: integer
+          format: 'nonNegativeInteger (total number of digits: 24)'
+          example: 221120202345756576
+          description: The parent order line number.
+      description: Parent orderLine.
+    orderLineRelationship_childLine:
+      type: object
+      properties:
+        primeLineNo:
+          type: integer
+          format: 'nonNegativeInteger (total number of digits: 24)'
+          example: 221120202345756576
+          description: The child order line number.
+      description: Child orderLine.
+    workOrder_extn:
         type: object
         properties:
           TSPID:
