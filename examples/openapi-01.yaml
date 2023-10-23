@@ -37,24 +37,23 @@ paths:
 
             
       requestBody:
-        $ref: '#/components/schemas/getOrderInfoRequest'
+        $ref: '#/components/requestBodies/getOrderInfoRequest'
       responses:
         "200":
           description: Response to get order Info
           content:
             application/json:
               schema:
-                $ref: '#/components/getOrderInfoResponse'
+                $ref: '#/components/schemas/getOrderInfoResponse'
         "400":
           description: Failed processing
           content:
             application/json:
               schema:
-                $ref: '#/components/getOrderInfoErrorResponse'
+                $ref: '#/components/schemas/getOrderInfoErrorResponse'
           
 components:
-  schemas:
-
+  requestBodies:
     getOrderInfoRequest:
       type: object
       properties:
@@ -63,11 +62,19 @@ components:
            format: 'nonNegativeInteger (total number of digits: 24)'
            example: '20200904175504198948'
            description: Unique key of the iSOM order.
+  schemas:
+
     getOrderInfoResponse:
       type: object
       properties:
         orderList:
           $ref: '#/components/getOrderInfoResponse_orderList'
+    getOrderInfoErrorResponse:
+      type: object
+      properties:
+        error:
+          $ref: '#/components/getOrderInfoErrorResponse_error'
+  
   order:
     type: object
     required:
@@ -452,11 +459,6 @@ components:
         format: 'maximum length: 40'
         example: +344544444
         description: The alternate phone number at which the person or a predesignated employee of the organization referred to in the address can be called.
-  getOrderInfoErrorResponse:
-    type: object
-    properties:
-      error:
-        $ref: '#/components/getOrderInfoErrorResponse_error'
   getOrderInfoResponse_orderList:
     type: object
     required:
