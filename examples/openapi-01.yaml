@@ -19,27 +19,27 @@ paths:
   "/{region}/get-order-info":
     post:
       tags:
-      - Get Order Info Service
+        - Get Order Info Service
       summary: get order Info for the Order
       operationId: IKEAGetOrderInfo
       parameters:
-      - name: region
-        in: path
-        required: true
-        schema:
+        - name: region
+          in: path
+          required: true
+          schema:
             type: string
         
-      - name: Authorization
-        in: header
-        required: true
-        schema:
+        - name: Authorization
+          in: header
+          required: true
+          schema:
             type: string
-      - in: path
-        name: Get Order Info Service
-        description: Request to get order info
-        required: true
-        schema:
-          $ref: '#/components/schemas/getOrderInfoRequest'
+        - in: path
+          name: get-order-info
+          description: Request to get order info
+          required: true
+          schema:
+            $ref: '#/components/schemas/getOrderInfoRequest'
       responses:
         "200":
           description: Response to get order Info
