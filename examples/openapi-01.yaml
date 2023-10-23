@@ -530,7 +530,7 @@ components:
   securitySchemes:
     bearerAuth:
       type: http
-      in: header
-      name: Bearer          
+      scheme: header
+      name: JWT          
 security:
   - bearerAuth: []
