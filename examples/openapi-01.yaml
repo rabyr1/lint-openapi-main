@@ -39,7 +39,7 @@ paths:
         description: Request to get order info
         required: true
         schema:
-          $ref: '#/components/getOrderInfoRequest'
+          $ref: '#/components/schemas/getOrderInfoRequest'
       responses:
         "200":
           description: Response to get order Info
@@ -55,19 +55,21 @@ paths:
                 $ref: '#/components/getOrderInfoErrorResponse'
           
 components:
-  getOrderInfoRequest:
-    type: object
-    properties:
-      orderHeaderKey:
-        type: string
-        format: 'nonNegativeInteger (total number of digits: 24)'
-        example: '20200904175504198948'
-        description: Unique key of the iSOM order.
-  getOrderInfoResponse:
-    type: object
-    properties:
-      orderList:
-        $ref: '#/components/getOrderInfoResponse_orderList'
+  schemas:
+
+    getOrderInfoRequest:
+      type: object
+      properties:
+        orderHeaderKey:
+           type: string
+           format: 'nonNegativeInteger (total number of digits: 24)'
+           example: '20200904175504198948'
+           description: Unique key of the iSOM order.
+    getOrderInfoResponse:
+      type: object
+      properties:
+        orderList:
+          $ref: '#/components/getOrderInfoResponse_orderList'
   order:
     type: object
     required:
