@@ -140,11 +140,11 @@ components:
         orderLineRelationships:
           $ref: '#/components/schemas/order_orderLineRelationships'
         personInfoShipTo:
-          $ref: '#/components/orders/order_personInfoShipTo'
+          $ref: '#/components/schemas/order_personInfoShipTo'
         personInfoBillTo:
-          $ref: '#/components/orders/order_personInfoBillTo'
+          $ref: '#/components/schemas/order_personInfoBillTo'
         shipmentList:
-          $ref: '#/components/orders/order_shipmentList'
+          $ref: '#/components/schemas/order_shipmentList'
     order_extn:
       type: object
       required:
@@ -191,9 +191,9 @@ components:
           example: CDC.001
           description: Ship node id from where line is getting fulfilled
         itemDetails:
-          $ref: '#/components/orders/order_orderLines_orderLine_itemDetails'
+          $ref: '#/components/schemas/order_orderLines_orderLine_itemDetails'
         workOrders:
-          $ref: '#/components/orders/order_orderLines_orderLine_workOrders'
+          $ref: '#/components/schemas/order_orderLines_orderLine_workOrders'
       description: Contains orderline information.
     order_orderLines_orderLine_itemDetails:
       type: object
@@ -207,7 +207,7 @@ components:
           example: ART20350182/SGR40400001
           description: Unique id of the orderLine item.
         extn:
-          $ref: '#/components/orders/order_orderLines_orderLine_itemDetails_extn'
+          $ref: '#/components/schemas/order_orderLines_orderLine_itemDetails_extn'
       description: Contains orderLine item information.
     order_orderLines_orderLine_itemDetails_extn:
       type: object
@@ -224,12 +224,12 @@ components:
       - workOrder
       properties:
         workOrder:
-          $ref: '#/components/orders/order_orderLines_orderLine_WOs_WO'
+          $ref: '#/components/schemas/order_orderLines_orderLine_WOs_WO'
       description: Contains list of workOrders.
     order_orderLines_orderLine_WOs_WO:
       type: array
       items:
-        $ref: '#/components/orders/workOrder'
+        $ref: '#/components/schemas/workOrder'
     workOrder:
       type: object
       required:
@@ -271,7 +271,7 @@ components:
           example: "4201022"
           description: Number of the work order associated to the order line.
         extn:
-          $ref: '#/components/orders/workOrder_extn'  
+          $ref: '#/components/schemas/workOrder_extn'  
       description: Contains work order information associated to the order line.
     order_orderLineRelationships:
       type: object
@@ -279,12 +279,12 @@ components:
       - orderLineRelationship
       properties:
         orderLineRelationship:
-          $ref: '#/components/orders/order_orderLineRelationships_orderLineRelationship'
+          $ref: '#/components/schemas/order_orderLineRelationships_orderLineRelationship'
       description: The type of relationship between the parent and the child line.
     order_orderLineRelationships_orderLineRelationship:
       type: array
       items:
-        $ref: '#/components/orders/orderLineRelationship'
+        $ref: '#/components/schemas/orderLineRelationship'
     orderLineRelationship:
       type: object
       required:
@@ -298,9 +298,9 @@ components:
           example: DELIVERY / SERVICE
           description: The type of relationship between order lines.
         parentLine:
-          $ref: '#/components/orders/orderLineRelationship_parentLine'
+          $ref: '#/components/schemas/orderLineRelationship_parentLine'
         childLine:
-          $ref: '#/components/orders/orderLineRelationship_childLine'
+          $ref: '#/components/schemas/orderLineRelationship_childLine'
       description: The type of relationship between the parent and the child line.
     order_personInfoShipTo:
       type: object
@@ -353,7 +353,7 @@ components:
           example: +344544444
           description: The alternate phone number at which the person or a predesignated employee of the organization referred to in the address can be called.
         extn:
-          $ref: '#/components/orders/order_personInfoShipTo_extn'
+          $ref: '#/components/schemas/order_personInfoShipTo_extn'
       description: personInfoShipTo details
     order_personInfoShipTo_extn:
       type: object
@@ -374,10 +374,10 @@ components:
           example: 1
           description: Number of shipments created for the orders.
         shipment:
-          $ref: '#/components/orders/order_shipmentList_shipment'
+          $ref: '#/components/schemas/order_shipmentList_shipment'
           description: Shipment created for the order.It is optional. When source is OrderInfo in request,then this value will be retrieved    
         extn:
-          $ref: '#/components/orders/order_shipmentList_extn'
+          $ref: '#/components/schemas/order_shipmentList_extn'
           description: shipments details.
     order_shipmentList_shipment:
       type: object
@@ -396,7 +396,7 @@ components:
           example: 1
           description: Number of shipments created for the orders.
         shipmentLines:
-          $ref: '#/components/orders/order_shipmentList_shipment_shipmentLines'
+          $ref: '#/components/schemas/order_shipmentList_shipment_shipmentLines'
           description: Shipments lines created for the workorder.
     order_shipmentList_extn:
       type: object
@@ -421,7 +421,7 @@ components:
       properties:
         shipmentLine:
           type: object
-          $ref: '#/components/orders/order_shipmentList_shipment_shipmentLines_shipmentLine'
+          $ref: '#/components/schemas/order_shipmentList_shipment_shipmentLines_shipmentLine'
     order_shipmentList_shipment_shipmentLines_shipmentLine:	
       type: object
       required:
