@@ -33,13 +33,7 @@ paths:
           schema:
             type: string
         
-        - name: Authorization
-          in: header
-          required: true
-          schema:
-            type: string
-
-            
+                   
       requestBody:
         $ref: '#/components/requestBodies/getOrderInfoRequest'
       responses:
@@ -534,9 +528,9 @@ components:
             description: TSP Name from centiro for Cust Returns
             example: TSPName  
   securitySchemes:
-    Authorization:
-      type: string
+    bearerAuth:
+      type: http
       in: header
       name: Bearer          
 security:
-  - Authorization: []
+  - bearerAuth: []
