@@ -28,6 +28,4 @@ jobs:
         with:
           files: |
             examples/openapi-01.yaml
-            examples/openapi-03.yaml
-            examples/openapi-04.yaml
-            shouldApplyGatewayRules: true
+            
