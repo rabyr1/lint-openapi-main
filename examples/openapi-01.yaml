@@ -81,8 +81,23 @@ components:
       type: object
       properties:
         error:
-          $ref: '#/components/getOrderInfoErrorResponse_error'
-
+          $ref: '#/components/schemas/getOrderInfoErrorResponse_error'
+    getOrderInfoErrorResponse_error:
+      type: object
+      required:
+        - errorCode
+        - errorDescription
+      properties:
+        errorCode:
+          type: string
+          format: maximum length:40
+          example: EXTN_SOM_OI_0001
+          description: Unique identifier of the error.
+        errorDescription:
+          type: string
+          format: maximum length:100
+          example: OrderHeaderKey is either empty or missing in the request
+          description: Description of the error.  
     getOrderInfoResponse_orderList:
       type: object
       required:
@@ -119,19 +134,19 @@ components:
           example: "1091774407"
           description: Number of the iSOM order.
         extn:
-          $ref: '#/components/schemas/order_extn'
+          $ref: '#/components/orders/order_extn'
         orderLines:
-          $ref: '#/components/schemas/order_orderLines'
+          $ref: '#/components/orders/order_orderLines'
         orderLineRelationships:
-          $ref: '#/components/schemas/order_orderLineRelationships'
+          $ref: '#/components/orders/order_orderLineRelationships'
         personInfoShipTo:
-          $ref: '#/components/schemas/order_personInfoShipTo'
+          $ref: '#/components/orders/order_personInfoShipTo'
         personInfoBillTo:
-          $ref: '#/components/schemas/order_personInfoBillTo'
+          $ref: '#/components/orders/order_personInfoBillTo'
         shipmentList:
-          $ref: '#/components/schemas/order_shipmentList'
-        r_extn:
-        pe: object
+          $ref: '#/components/orders/order_shipmentList'
+      order_extn:
+        type: object
         required:
         - preferredCommunicationMethod
         - preferredLanguage
@@ -152,11 +167,11 @@ components:
         - orderLine
         properties:
           orderLine:
-            $ref: '#/components/schemas/order_orderLines_orderLine'
+            $ref: '#/components/orders/order_orderLines_orderLine'
       order_orderLines_orderLine:
         type: array
         items:
-          $ref: '#/components/schemas/orderLine'
+          $ref: '#/components/orders/orderLine'
       orderLine:
         type: object
         required:
@@ -176,9 +191,9 @@ components:
             example: CDC.001
             description: Ship node id from where line is getting fulfilled
           itemDetails:
-            $ref: '#/components/schemas/order_orderLines_orderLine_itemDetails'
+            $ref: '#/components/orders/order_orderLines_orderLine_itemDetails'
           workOrders:
-            $ref: '#/components/schemas/order_orderLines_orderLine_workOrders'
+            $ref: '#/components/orders/order_orderLines_orderLine_workOrders'
         description: Contains orderline information.
       order_orderLines_orderLine_itemDetails:
         type: object
@@ -192,7 +207,7 @@ components:
             example: ART20350182/SGR40400001
             description: Unique id of the orderLine item.
           extn:
-            $ref: '#/components/schemas/order_orderLines_orderLine_itemDetails_extn'
+            $ref: '#/components/orders/order_orderLines_orderLine_itemDetails_extn'
         description: Contains orderLine item information.
       order_orderLines_orderLine_itemDetails_extn:
         type: object
@@ -209,12 +224,12 @@ components:
         - workOrder
         properties:
           workOrder:
-            $ref: '#/components/schemas/order_orderLines_orderLine_WOs_WO'
+            $ref: '#/components/orders/order_orderLines_orderLine_WOs_WO'
         description: Contains list of workOrders.
       order_orderLines_orderLine_WOs_WO:
         type: array
         items:
-          $ref: '#/components/schemas/workOrder'
+          $ref: '#/components/orders/workOrder'
       workOrder:
         type: object
         required:
@@ -256,7 +271,7 @@ components:
             example: "4201022"
             description: Number of the work order associated to the order line.
           extn:
-            $ref: '#/components/schemas/workOrder_extn'  
+            $ref: '#/components/orders/workOrder_extn'  
         description: Contains work order information associated to the order line.
       order_orderLineRelationships:
         type: object
@@ -264,12 +279,12 @@ components:
         - orderLineRelationship
         properties:
           orderLineRelationship:
-            $ref: '#/components/schemas/order_orderLineRelationships_orderLineRelationship'
+            $ref: '#/components/orders/order_orderLineRelationships_orderLineRelationship'
         description: The type of relationship between the parent and the child line.
       order_orderLineRelationships_orderLineRelationship:
         type: array
         items:
-          $ref: '#/components/schemas/orderLineRelationship'
+          $ref: '#/components/orders/orderLineRelationship'
       orderLineRelationship:
         type: object
         required:
@@ -283,9 +298,9 @@ components:
             example: DELIVERY / SERVICE
             description: The type of relationship between order lines.
           parentLine:
-            $ref: '#/components/schemas/orderLineRelationship_parentLine'
+            $ref: '#/components/orders/orderLineRelationship_parentLine'
           childLine:
-            $ref: '#/components/schemas/orderLineRelationship_childLine'
+            $ref: '#/components/orders/orderLineRelationship_childLine'
         description: The type of relationship between the parent and the child line.
       order_personInfoShipTo:
         type: object
@@ -338,7 +353,7 @@ components:
             example: +344544444
             description: The alternate phone number at which the person or a predesignated employee of the organization referred to in the address can be called.
           extn:
-            $ref: '#/components/schemas/order_personInfoShipTo_extn'
+            $ref: '#/components/orders/order_personInfoShipTo_extn'
         description: personInfoShipTo details
       order_personInfoShipTo_extn:
         type: object
@@ -359,10 +374,10 @@ components:
             example: 1
             description: Number of shipments created for the orders.
           shipment:
-            $ref: '#/components/schemas/order_shipmentList_shipment'
+            $ref: '#/components/orders/order_shipmentList_shipment'
             description: Shipment created for the order.It is optional. When source is OrderInfo in request,then this value will be retrieved    
           extn:
-            $ref: '#/components/schemas/order_shipmentList_extn'
+            $ref: '#/components/orders/order_shipmentList_extn'
             description: shipments details.
       order_shipmentList_shipment:
         type: object
@@ -381,7 +396,7 @@ components:
             example: 1
             description: Number of shipments created for the orders.
           shipmentLines:
-            $ref: '#/components/schemas/order_shipmentList_shipment_shipmentLines'
+            $ref: '#/components/orders/order_shipmentList_shipment_shipmentLines'
             description: Shipments lines created for the workorder.
       order_shipmentList_extn:
         type: object
@@ -406,7 +421,7 @@ components:
         properties:
           shipmentLine:
             type: object
-            $ref: '#/components/schemas/order_shipmentList_shipment_shipmentLines_shipmentLine'
+            $ref: '#/components/orders/order_shipmentList_shipment_shipmentLines_shipmentLine'
       order_shipmentList_shipment_shipmentLines_shipmentLine:	
         type: object
         required:
@@ -514,19 +529,4 @@ components:
             format: 'maximum length: 150'
             description: TSP Name from centiro for Cust Returns
             example: TSPName  
-      getOrderInfoErrorResponse_error:
-    type: object
-    required:
-    - errorCode
-    - errorDescription
-    properties:
-      errorCode:
-        type: string
-        format: maximum length:40
-        example: EXTN_SOM_OI_0001
-        description: Unique identifier of the error.
-      errorDescription:
-        type: string
-        format: maximum length:100
-        example: OrderHeaderKey is either empty or missing in the request
-        description: Description of the error.  
+ 
