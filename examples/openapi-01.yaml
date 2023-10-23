@@ -530,6 +530,11 @@ components:
             type: string
             format: 'maximum length: 150'
             description: TSP Name from centiro for Cust Returns
-            example: TSPName  
+            example: TSPName 
+  securitySchemes:
+    Authorization:
+      type: string
+      in: header
+      name: Bearer Token          
 security:
-  - ApiKeyAuth: []
+  - Authorization: []
