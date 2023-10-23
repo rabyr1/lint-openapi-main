@@ -81,6 +81,7 @@ components:
     getOrderInfoErrorResponse:
       type: object
       properties:
+        type:
         error:
           $ref: '#/components/schemas/getOrderInfoErrorResponse_error'
     getOrderInfoErrorResponse_error:
@@ -530,4 +531,5 @@ components:
             format: 'maximum length: 150'
             description: TSP Name from centiro for Cust Returns
             example: TSPName  
- 
+security:
+  - ApiKeyAuth: []
