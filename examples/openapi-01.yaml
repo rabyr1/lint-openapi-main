@@ -66,7 +66,7 @@ components:
       type: object
       properties:
         orderList:
-          $ref: '#/components/getOrderInfoResponse_orderList'
+          $ref: '#/components/schemas/getOrderInfoResponse_orderList'
     OrderHeaderKey:
       type: object
       required:
@@ -134,11 +134,11 @@ components:
           example: "1091774407"
           description: Number of the iSOM order.
         extn:
-          $ref: '#/components/orders/order_extn'
+          $ref: '#/components/schemas/order_extn'
         orderLines:
-          $ref: '#/components/orders/order_orderLines'
+          $ref: '#/components/schemas/order_orderLines'
         orderLineRelationships:
-          $ref: '#/components/orders/order_orderLineRelationships'
+          $ref: '#/components/schemas/order_orderLineRelationships'
         personInfoShipTo:
           $ref: '#/components/orders/order_personInfoShipTo'
         personInfoBillTo:
