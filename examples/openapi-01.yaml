@@ -74,14 +74,16 @@ components:
            type: string
            format: 'nonNegativeInteger (total number of digits: 24)'
            example: '20200904175504198948'
-           description: Unique key of the iSOM order.  
+           description: Unique key of the iSOM order.
+           
     getOrderInfoErrorResponse:
       type: object
       properties:
         type:
+          type: string
         error:
           $ref: '#/components/schemas/getOrderInfoErrorResponse_error'
-      title:
+        title:
           type: string
           description: |
             A short, summary of the problem type. Written in english and readable
@@ -93,6 +95,7 @@ components:
         - errorCode
         - errorDescription
       properties:
+         
         errorCode:
           type: string
           format: maximum length:40
