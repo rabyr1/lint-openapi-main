@@ -13,8 +13,9 @@ tags:
 - name: iSOM Get Order Info API
   description: iSOM Get Order Info API
 servers:
-  
+DEV: 
 - url: https://api.ingka.cte.ikeadt.com/om/order-management/eu/get-order-info
+  description: DEV  
 paths:
   "/{region}/get-order-info":
     post:
