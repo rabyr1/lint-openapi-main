@@ -531,6 +531,6 @@ components:
     bearerAuth:
       type: http
       scheme: header
-      name: JWT          
+      bearerFormat: JWT          
 security:
   - bearerAuth: []
