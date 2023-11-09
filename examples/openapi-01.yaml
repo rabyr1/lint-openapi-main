@@ -3,9 +3,7 @@ info:
   description: This is an API to Get Ikea iSOM order information.
   version: 1.0.4
   title: iSOM Get Order Info API
-  license:
-    name: Apache 2.0
-    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  
   contact:
     name: Order-Conception-Team
     email: dl.fulfillment.scrum.team.order_conception.se@ingka.com
