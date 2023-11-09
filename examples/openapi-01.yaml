@@ -4,7 +4,7 @@ info:
   version: 1.0.0
   title: IKEACreateOrderSync
   contact:
-    email: nikhila.kurmala@ingka.ikea.com
+  email: nikhila.kurmala@ingka.ikea.com
 basePath: /om/order-management
 tags:
 - name: Create Order Service
