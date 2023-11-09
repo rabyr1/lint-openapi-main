@@ -1,544 +1,831 @@
-openapi: 3.0.3
+swagger: "2.0"
 info:
-  description: This is an API to Get Ikea iSOM order information.
-  version: 1.0.4
-  title: iSOM Get Order Info API
-  
+  description: API to provide time windows for the delivery arrangement selected
+  version: "1.0.12"
+  title: GetTimeWindows
   contact:
-    name: Order-Conception-Team
-    email: dl.fulfillment.scrum.team.order_conception.se@ingka.com
+    email: o365g_phoenix_itdedor@ingka.com
+host: d2seelm-bb9120.ikead2.com
+basePath: /cfb/customer-promise
 tags:
-- name: iSOM Get Order Info API
-  description: iSOM Get Order Info API
-servers:
-  - url: https://api.ingka.cte.ikeadt.com/om/order-management/eu/get-order-info
-    description: API Gateway DEV 
-  - url: https://api.ingka.ikea.com/om/order-management/eu/get-order-info
-    description: API Gateway PROD
-  - url: https://api.ingka.ppe.ikeadt.com/om/order-management/eu/get-order-info
-    description: API Gateway STAGE
+- name: timeWindows
+  description: Time Windows for the delivery arrangement selected
+schemes:
+- https
+consumes:
+- application/json
+produces:
+- application/json
 paths:
-  "/{region}/get-order-info":
+  /{region}/time-windows:
     post:
       tags:
-        - Get Order Info Service
-      summary: get order Info for the Order
-      operationId: IKEAGetOrderInfo
+      - Get Time Windows
+      operationId: GetTimeWindows
+      consumes:
+      - application/json
+      produces:
+      - application/json
       parameters:
-        - name: region
-          in: path
-          required: true
-          schema:
-            type: string
-        
-                   
-      requestBody:
-        $ref: '#/components/requestBodies/getOrderInfoRequest'
+      - name: region
+        in: path
+        required: true
+        type: string
+      - name: Authorization
+        in: header
+        required: true
+        type: string
+      - in: body
+        name: Time Windows
+        description: Input to Time Windows
+        required: true
+        schema:
+          $ref: '#/definitions/timeWindowsRequest'
       responses:
         "200":
-          description: Response to get order Info
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/getOrderInfoResponse'
+          description: Delivery Arrangements for given cart
+          schema:
+            $ref: '#/definitions/timeWindowsResponse'
         "400":
-          description: Failed processing
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/getOrderInfoErrorResponse'
-          
-components:
-  requestBodies:
-    getOrderInfoRequest:
-      content:
-        application/json:
-           schema:
-            $ref: "#/components/schemas/OrderHeaderKey"         
-      
-  schemas:
-
-    getOrderInfoResponse:
-      type: object
-      properties:
-        orderList:
-          $ref: '#/components/schemas/getOrderInfoResponse_orderList'
-    OrderHeaderKey:
-      type: object
-      required:
-        - orderHeaderKey
-      properties:
-        orderHeaderKey:
-           type: string
-           format: 'nonNegativeInteger (total number of digits: 24)'
-           example: '20200904175504198948'
-           description: Unique key of the iSOM order.
-           
-    getOrderInfoErrorResponse:
-      type: object
-      properties:
-        type:
-          type: string
-        error:
-          $ref: '#/components/schemas/getOrderInfoErrorResponse_error'
-        title:
-          type: string
-          description: |
-            A short, summary of the problem type. Written in english and readable
-            for engineers (usually not suited for non technical stakeholders and
-            not localized); example: Service Unavailable
-    getOrderInfoErrorResponse_error:
-      type: object
-      required:
-        - errorCode
-        - errorDescription
-      properties:
-         
-        errorCode:
-          type: string
-          format: maximum length:40
-          example: EXTN_SOM_OI_0001
-          description: Unique identifier of the error.
-        errorDescription:
-          type: string
-          format: maximum length:100
-          example: OrderHeaderKey is either empty or missing in the request
-          description: Description of the error.  
-    getOrderInfoResponse_orderList:
-      type: object
-      required:
-        - order
-        - totalOrderList
-      properties:
-        totalOrderList:
-          type: string
-          format: maximum length:5
-          example: "1"
-          description: Number of orders for which information is returned
-        order:
-          $ref: '#/components/schemas/order'
-      
-    order:
-      type: object
-      required:
-        - enterpriseCode
-        - extn
-        - orderLineRelationships
-        - orderLines
-        - orderNo
-        - personInfoBillTo
-        - personInfoShipTo
-      properties:
-        enterpriseCode:
-          type: string
-          format: maximum length:24
-          example: IKEA_GB
-          description: Country Code to identify to which country the order belongs to.
-        orderNo:
-          type: string
-          format: 'maximum length: 40'
-          example: "1091774407"
-          description: Number of the iSOM order.
-        extn:
-          $ref: '#/components/schemas/order_extn'
-        orderLines:
-          $ref: '#/components/schemas/order_orderLines'
-        orderLineRelationships:
-          $ref: '#/components/schemas/order_orderLineRelationships'
-        personInfoShipTo:
-          $ref: '#/components/schemas/order_personInfoShipTo'
-        personInfoBillTo:
-          $ref: '#/components/schemas/order_personInfoBillTo'
-        shipmentList:
-          $ref: '#/components/schemas/order_shipmentList'
-    order_extn:
-      type: object
-      required:
-      - preferredCommunicationMethod
-      - preferredLanguage
-      properties:
-        preferredLanguage:
-          type: string
-          format: 'maximum length: 40'
-          example: en
-          description: preferredLanguage
-        preferredCommunicationMethod:
-          type: string
-          format: 'maximum length: 40'
-          example: EMAIL/SMS
-          description: Customer's preferred communication method
-    order_orderLines:
-      type: object
-      required:
-      - orderLine
-      properties:
-        orderLine:
-          $ref: '#/components/schemas/order_orderLines_orderLine'
-    order_orderLines_orderLine:
-      type: array
-      items:
-        $ref: '#/components/schemas/orderLine'
-    orderLine:
-      type: object
-      required:
-      - itemDetails
-      - orderLineKey
-      - shipNode
-      - workOrders
-      properties:
-        orderLineKey:
-          type: integer
-          format: 'nonNegativeInteger (total number of digits: 24)'
-          example: 221120202345756576
-          description: Unique key for the order line
-        shipNode:
-          type: string
-          format: 'maximum length: 24'
-          example: CDC.001
-          description: Ship node id from where line is getting fulfilled
-        itemDetails:
-          $ref: '#/components/schemas/order_orderLines_orderLine_itemDetails'
-        workOrders:
-          $ref: '#/components/schemas/order_orderLines_orderLine_workOrders'
-      description: Contains orderline information.
-    order_orderLines_orderLine_itemDetails:
-      type: object
-      required:
-      - extn
-      - itemID
-      properties:
-        itemID:
-          type: string
-          format: 'maximum length: 40'
-          example: ART20350182/SGR40400001
-          description: Unique id of the orderLine item.
-        extn:
-          $ref: '#/components/schemas/order_orderLines_orderLine_itemDetails_extn'
-      description: Contains orderLine item information.
-    order_orderLines_orderLine_itemDetails_extn:
-      type: object
-      properties:
-        itemID:
-          type: string
-          format: 'maximum length: 40'
-          example: TRUCK/PARCEL
-          description: Unique id of the orderLine item.
-      description: Contains orderLine item information.
-    order_orderLines_orderLine_workOrders:
-      type: object
-      required:
-      - workOrder
-      properties:
-        workOrder:
-          $ref: '#/components/schemas/order_orderLines_orderLine_WOs_WO'
-      description: Contains list of workOrders.
-    order_orderLines_orderLine_WOs_WO:
-      type: array
-      items:
-        $ref: '#/components/schemas/workOrder'
-    workOrder:
-      type: object
-      required:
-      - nodeKey
-      - promisedApptEndDate
-      - promisedApptStartDate
-      - providerOrganizationCode
-      - timezone
-      - workOrderNo
-      properties:
-        nodeKey:
-          type: string
-          format: 'maximum length: 24'
-          example: LSC.258
-          description: This is the node where prod lines are merged before final delivery
-        promisedApptStartDate:
-          type: string
-          format: dateTime
-          example: 2020-08-12T16:00:00.000Z
-          description: The date and time when the appointment starts for an OrderLine.This date only applies to both Delivery (ItemGroupCode=DS) and Provided (ItemGroupCode=PS) lines for ISOM.
-        promisedApptEndDate:
-          type: string
-          format: dateTime
-          example: 2020-08-12T07:00:00.000Z
-          description: The date and time when the appointment ends for an OrderLine. This date only applies to Delivery  (ItemGroupCode=DS) and Provided (ItemGroupCode=PS) lines for ISOM.
-        providerOrganizationCode:
-          type: string
-          format: 'maximum length: 24'
-          example: "4201022"
-          description: Transport service provider unique code
-        timezone:
-          type: string
-          format: 'maximum length: 40'
-          example: Europe/London
-          description: The timezone in which the promised appointment has been recorded. This attribute only applies to  Provided (ItemGroupCode=PS) and  (ItemGroupCode=DS) lines.
-        workOrderNo:
-          type: string
-          format: 'maximum length: 40'
-          example: "4201022"
-          description: Number of the work order associated to the order line.
-        extn:
-          $ref: '#/components/schemas/workOrder_extn'  
-      description: Contains work order information associated to the order line.
-    order_orderLineRelationships:
-      type: object
-      required:
-      - orderLineRelationship
-      properties:
-        orderLineRelationship:
-          $ref: '#/components/schemas/order_orderLineRelationships_orderLineRelationship'
-      description: The type of relationship between the parent and the child line.
-    order_orderLineRelationships_orderLineRelationship:
-      type: array
-      items:
-        $ref: '#/components/schemas/orderLineRelationship'
-    orderLineRelationship:
-      type: object
-      required:
-      - childLine
-      - parentLine
-      - relationshipType
-      properties:
-        relationshipType:
-          type: string
-          format: 'maximum length: 40'
-          example: DELIVERY / SERVICE
-          description: The type of relationship between order lines.
-        parentLine:
-          $ref: '#/components/schemas/orderLineRelationship_parentLine'
-        childLine:
-          $ref: '#/components/schemas/orderLineRelationship_childLine'
-      description: The type of relationship between the parent and the child line.
-    order_personInfoShipTo:
-      type: object
-      required:
-      - country
-      properties:
-        eMailID:
-          type: string
-          format: 'maximum length: 150'
-          example: ' abc.xyz@ingka.com'
-          description: email ID
-        country:
-          type: string
-          format: 'maximum length: 40'
-          example: GB
-          description: The country in the address.
-        firstName:
-          type: string
-          format: 'maximum length: 64'
-          example: First Name
-          description: The first name of the person.
-        lastName:
-          type: string
-          format: 'maximum length: 64'
-          example: lastName
-          description: The last name of the person.
-        middleName:
-          type: string
-          format: 'maximum length: 40'
-          example: middleName
-          description: The middle name of the person.
-        dayPhone:
-          type: string
-          format: 'maximum length: 40'
-          example: +344544444
-          description: The day time phone at which the person or organization referred to in the address can be called.
-        eveningPhone:
-          type: string
-          format: 'maximum length: 30'
-          example: +344544444
-          description: The evening time phone at which the person or organization referred to in the address can be called.
-        mobilePhone:
-          type: string
-          format: 'maximum length: 40'
-          example: +344544445
-          description: The mobile phone at which the person or a predesignated employee of the organization referred to in the address can be called.
-        otherPhone:
-          type: string
-          format: 'maximum length: 40'
-          example: +344544444
-          description: The alternate phone number at which the person or a predesignated employee of the organization referred to in the address can be called.
-        extn:
-          $ref: '#/components/schemas/order_personInfoShipTo_extn'
-      description: personInfoShipTo details
-    order_personInfoShipTo_extn:
-      type: object
-      properties:
-        globalCustomerId:
-          type: string
-          format: 'maximum length: 100'
-          description: globalCustomerId
-    order_shipmentList:
-      type: object
-      required:
-      - totalNumberOfRecords
-      - shipment
-      properties:
-        totalNumberOfRecords:
-          type: string
-          format: 'maximum length: 5'
-          example: 1
-          description: Number of shipments created for the orders.
-        shipment:
-          $ref: '#/components/schemas/order_shipmentList_shipment'
-          description: Shipment created for the order.It is optional. When source is OrderInfo in request,then this value will be retrieved    
-        extn:
-          $ref: '#/components/schemas/order_shipmentList_extn'
-          description: shipments details.
-    order_shipmentList_shipment:
-      type: object
-      required:
-       - totalQuantity
-       - shipmentNo
-      properties:
-        totalQuantity:
-          type: string
-          format: 'maximum length: 5'
-          example: 10
-          description: total quantity of the shipments.
-        shipmentNo:
-          type: string
-          format: 'maximum length: 5'
-          example: 1
-          description: Number of shipments created for the orders.
-        shipmentLines:
-          $ref: '#/components/schemas/order_shipmentList_shipment_shipmentLines'
-          description: Shipments lines created for the workorder.
-    order_shipmentList_extn:
-      type: object
-      required:
-       - cduID
-       - quantity
-      properties:
-        cduID:
-          type: string
-          format: 'maximum length: 40'
-          example: 110505175
-          description: CduId number
-        quantity:
-          type: string
-          format: 'maximum length: 40'
-          example: 5.00
-          description: Quantity of the shipments
-    order_shipmentList_shipment_shipmentLines:
-      type: object
-      required:
-      - shipmentLine
-      properties:
-        shipmentLine:
-          type: object
-          $ref: '#/components/schemas/order_shipmentList_shipment_shipmentLines_shipmentLine'
-    order_shipmentList_shipment_shipmentLines_shipmentLine:	
-      type: object
-      required:
-       - primeLineNo
-       - quantity
-       - orderLineKey
-      properties:
-        primeLineNo:
-          type: string
-          format: 'maximum length: 40'
-          example: 1
-          description: Shipmentlines created corresponding to prod orderlines.
-        quantity:
-          type: string
-          format: 'maximum length: 40'
-          example: 2.00
-          description: The type of relationship between order lines.
-        orderLineKey:
-          type: string
-          format: 'maximum length: 40'
-          example: 202202170936171501188787
-          description: orderLineKey id.
-    order_personInfoBillTo:
-      type: object
-      required:
-      - country
-      - firstName
-      - lastName
-      properties:
-        eMailID:
-          type: string
-          format: 'maximum length: 150'
-          example: ' abc.xyz@ingka.com'
-          description: email ID
-        country:
-          type: string
-          format: 'maximum length: 40'
-          example: GB
-          description: The country in the address.
-        firstName:
-          type: string
-          format: 'maximum length: 64'
-          example: First Name
-          description: The first name of the person.
-        lastName:
-          type: string
-          format: 'maximum length: 64'
-          example: lastName
-          description: The last name of the person.
-        middleName:
-          type: string
-          format: 'maximum length: 40'
-          example: middleName
-          description: The middle name of the person.
-        dayPhone:
-          type: string
-          format: 'maximum length: 40'
-          example: +344544444
-          description: The day time phone at which the person or organization referred to in the address can be called.
-        eveningPhone:
-          type: string
-          format: 'maximum length: 30'
-          example: +344544444
-          description: The evening time phone at which the person or organization referred to in the address can be called.
-        mobilePhone:
-          type: string
-          format: 'maximum length: 40'
-          example: +344544445
-          description: The mobile phone at which the person or a predesignated employee of the organization referred to in the address can be called.
-        otherPhone:
-          type: string
-          format: 'maximum length: 40'
-          example: +344544444
-          description: The alternate phone number at which the person or a predesignated employee of the organization referred to in the address can be called.
-    orderLineRelationship_parentLine:
-      type: object
-      required:
-      - orderLineKey
-      properties:
-        orderLineKey:
-          type: integer
-          format: 'nonNegativeInteger (total number of digits: 24)'
-          example: 221120202345756576
-          description: The parent order line number.
-      description: Parent orderLine.
-    orderLineRelationship_childLine:
-      type: object
-      properties:
-        primeLineNo:
-          type: integer
-          format: 'nonNegativeInteger (total number of digits: 24)'
-          example: 221120202345756576
-          description: The child order line number.
-      description: Child orderLine.
-    workOrder_extn:
-        type: object
-        properties:
-          TSPID:
-            type: string
-            format: 'maximum length: 24'
-            description: TSPID from Centiro for Cust Returns
-            example: TSPID
-          TSPName:
-            type: string
-            format: 'maximum length: 150'
-            description: TSP Name from centiro for Cust Returns
-            example: TSPName  
-  securitySchemes:
-    bearerAuth:
-      type: http
-      scheme: header
-      bearerFormat: JWT          
-security:
-  - bearerAuth: []
+          description: Not Valid response
+definitions:
+  timeWindowsRequest:
+    type: object
+    required:
+    - selectedSolution
+    properties:
+      deliveryArrangementsId:
+        type: string
+        example: "20191111104614111186745"
+        description: Unique identifier associated with each DO invocation
+      orderNo:
+        type: string
+        example: "1091424950"
+        description: Unique identifier associated with an order. This attribute to be sent whenever there is a direct time windows invocation.
+      returnMultipleSrvcSlots:
+        type: boolean
+        description: Flag to indicate if a single time window should be returned or multiple time windows.
+        default: false
+      channelReferences:
+        $ref: '#/definitions/channelReferencesModel'
+      selectedSolution:
+        $ref: '#/definitions/timeWindowsRequest_selectedSolution'
+    example:
+      deliveryArrangementsId: 20191111104614111186745
+      orderNo: 1091424950
+      returnMultipleSrvcSlots: false
+      selectedSolution:
+      - solutionId: HD~1~STANDARD
+        deliveryLine:
+        - deliveryId: HD~1~1
+          serviceSearchWindow: 7
+          reqstartDate: 2019-01-21T07:00:00.000+0000
+          pupIdentifier: PUP1004 Oxford 4 TSP B@IKEATSPBGB
+          returnMultipleSrvcSlots: true
+          mergeOrderNo: 1091424950
+          mergeDeliveryNo: 1
+        - deliveryId: HD~1~1
+          serviceSearchWindow: 7
+          reqstartDate: 2019-01-21T07:00:00.000+0000
+          pupIdentifier: PUP1043 Oxford 4 TSP B@IKEATSPBGB
+  timeWindowsResponse:
+    type: object
+    properties:
+      selectedSolution:
+        $ref: '#/definitions/timeWindowsResponse_selectedSolution'
+      itemLines:
+        $ref: '#/definitions/timeWindowsResponse_itemLines'
+      error:
+        $ref: '#/definitions/errorModel'
+    example:
+      selectedSolution:
+      - solutionId: HD~1~STANDARD
+        deliveryLine:
+        - deliveryId: HD~1~1
+          serviceSearchWindow: 7
+          isExceptionalQty: false
+          isExceptionalVolume: false
+          mergeOrderNo: 1091424950
+          mergeDeliveryNo: 1
+          slots:
+            timeZone: Europe/London
+            slot:
+            - endTime: 61200
+              startTime: 08:00:00
+              availableDates:
+                availableDate:
+                - timeWindowId: d904a57a-eea5-484f-b8b0-0c3800527cc1
+                  capacityAvailable: true
+                  date: 2018-09-21T00:00:00.000+0000
+                  node: LSC.1004
+                  resourcePoolId: S7j7lEs+sk6brwmOAOXRkA==
+                  slotAttributeGroup: grp1
+                  tspID: 1234
+                  tspName: Fedex
+                  capabilityOptions:
+                    capabilityOption:
+                      optionType: AuthorityToLeave
+                - timeWindowId: d904a57a-eea5-484f-b8b0-0c3800527cc2
+                  capacityAvailable: true
+                  date: 2018-09-22T00:00:00.000+0000
+                  node: LSC.1004
+                  resourcePoolId: S7j7lEs+sk6brwmOAOXRkA==
+                  slotAttributeGroup: grp1
+                  tspID: 1234
+                  tspName: Fedex
+                  capabilityOptions:
+                    capabilityOption:
+                      optionType: AuthorityToLeave
+                - timeWindowId: d904a57a-eea5-484f-b8b0-0c3800527cc3
+                  capacityAvailable: true
+                  date: 2018-09-23T00:00:00.000+0000
+                  node: LSC.1004
+                  resourcePoolId: S7j7lEs+sk6brwmOAOXRkA==
+                  slotAttributeGroup: grp1
+                  tspID: 1234
+                  tspName: Fedex
+                  capabilityOptions:
+                    capabilityOption:
+                      optionType: AuthorityToLeave
+                - timeWindowId: d904a57a-eea5-484f-b8b0-0c3800527cc4
+                  capacityAvailable: true
+                  date: 2018-09-24T00:00:00.000+0000
+                  node: LSC.1004
+                  resourcePoolId: S7j7lEs+sk6brwmOAOXRkA==
+                  slotAttributeGroup: grp1
+                  tspID: 1234
+                  tspName: Fedex
+                  capabilityOptions:
+                    capabilityOption:
+                      optionType: RANGE_OF_DAYS
+                - timeWindowId: d904a57a-eea5-484f-b8b0-0c3800527cc5
+                  capacityAvailable: true
+                  date: 2018-09-25T00:00:00.000+0000
+                  node: LSC.1004
+                  resourcePoolId: S7j7lEs+sk6brwmOAOXRkA==
+                  slotAttributeGroup: grp1
+                  tspID: 1234
+                  tspName: Fedex
+                - timeWindowId: d904a57a-eea5-484f-b8b0-0c3800527cc6
+                  capacityAvailable: true
+                  date: 2018-09-26T00:00:00.000+0000
+                  node: LSC.1004
+                  resourcePoolId: S7j7lEs+sk6brwmOAOXRkA==
+                  slotAttributeGroup: grp1
+                  tspID: 1234
+                  tspName: Fedex
+                - timeWindowId: d904a57a-eea5-484f-b8b0-0c3800527cc7
+                  capacityAvailable: true
+                  date: 2018-09-27T00:00:00.000+0000
+                  node: LSC.1004
+                  resourcePoolId: S7j7lEs+sk6brwmOAOXRkA=
+                  slotAttributeGroup: grp1
+                  tspID: 1234
+                  tspName: Fedex
+            - endTime: 72000
+              startTime: 43200
+              availableDates:
+                availableDate:
+                - timeWindowId: e904a57a-eea5-484f-b8b0-0c3800527cc1
+                  capacityAvailable: true
+                  date: 2018-09-21T00:00:00.000+0000
+                  node: LSC.1004
+                  resourcePoolId: FG5VUhFTd0qRVAuNAO8JZw==
+                  slotAttributeGroup: grp1
+                  tspID: 1234
+                  tspName: Fedex
+                - timeWindowId: e904a57a-eea5-484f-b8b0-0c3800527cc2
+                  capacityAvailable: true
+                  date: 2018-09-22T00:00:00.000+0000
+                  node: LSC.1004
+                  resourcePoolId: FG5VUhFTd0qRVAuNAO8JZw==
+                  slotAttributeGroup: grp1
+                  tspID: 1234
+                  tspName: Fedex
+                  capabilityOptions:
+                    capabilityOption:
+                      optionType: AuthorityToLeave
+                - timeWindowId: e904a57a-eea5-484f-b8b0-0c3800527cc3
+                  capacityAvailable: true
+                  date: 2018-09-23T00:00:00.000+0000
+                  node: LSC.1004
+                  resourcePoolId: FG5VUhFTd0qRVAuNAO8JZw==
+                  slotAttributeGroup: grp1
+                  tspID: 1234
+                  tspName: Fedex
+                - timeWindowId: e904a57a-eea5-484f-b8b0-0c3800527cc4
+                  capacityAvailable: true
+                  date: 2018-09-24T00:00:00.000+0000
+                  node: LSC.1004
+                  resourcePoolId: FG5VUhFTd0qRVAuNAO8JZw==
+                  slotAttributeGroup: grp1
+                  tspID: 1234
+                  tspName: Fedex
+                - timeWindowId: e904a57a-eea5-484f-b8b0-0c3800527cc5
+                  capacityAvailable: true
+                  date: 2018-09-25T00:00:00.000+0000
+                  node: LSC.1004
+                  resourcePoolId: FG5VUhFTd0qRVAuNAO8JZw==
+                  slotAttributeGroup: grp1
+                  tspID: 1234
+                  tspName: Fedex
+                - timeWindowId: e904a57a-eea5-484f-b8b0-0c3800527cc6
+                  capacityAvailable: true
+                  date: 2018-09-26T00:00:00.000+0000
+                  node: LSC.1004
+                  resourcePoolId: FG5VUhFTd0qRVAuNAO8JZw==
+                  slotAttributeGroup: grp1
+                  tspID: 1234
+                  tspName: Fedex
+                - timeWindowId: e904a57a-eea5-484f-b8b0-0c3800527cc7
+                  capacityAvailable: true
+                  date: 2018-09-27T00:00:00.000+0000
+                  node: LSC.1004
+                  resourcePoolId: FG5VUhFTd0qRVAuNAO8JZw==
+                  slotAttributeGroup: grp1
+                  tspID: 1234
+                  tspName: Fedex
+        - deliveryId: HD~1~2
+          serviceSearchWindow: 7
+          reqstartDate: 2019-01-21T07:00:00.000+0000
+          isExceptionalQty: false
+          isExceptionalVolume: false
+          slots:
+            timeZone: Europe/London
+            slot:
+              endTime: 61200
+              startTime: 08:00:00
+              availableDates:
+                availableDate:
+                - timeWindowId: cf1dcad8-1b1b-4b50-b12a-0c4e00526eb3
+                  capacityAvailable: true
+                  date: 2018-09-21T00:00:00.000+0000
+                  node: LSC.1043
+                  resourcePoolId: m7mlNkEskEu/9QvCAIrXYA==
+                  slotAttributeGroup: grp2
+                  tspID: 1234
+                  tspName: Fedex
+                - timeWindowId: cf1dcad8-1b1b-4b50-b12a-0c5e00526eb3
+                  capacityAvailable: true
+                  date: 2018-09-22T00:00:00.000+0000
+                  node: LSC.1043
+                  resourcePoolId: m7mlNkEskEu/9QvCAIrXYA==
+                  slotAttributeGroup: grp2
+                  tspID: 1234
+                  tspName: Fedex
+                - timeWindowId: cf1dcad8-1b1b-4b60-b12a-0c4e00526eb3
+                  capacityAvailable: true
+                  date: 2018-09-23T00:00:00.000+0000
+                  node: LSC.1043
+                  resourcePoolId: m7mlNkEskEu/9QvCAIrXYA==
+                  slotAttributeGroup: grp2
+                  tspID: 1234
+                  tspName: Fedex
+                - timeWindowId: df1dcad8-1b1b-4b50-b12a-0c4e00526eb3
+                  capacityAvailable: true
+                  date: 2018-09-24T00:00:00.000+0000
+                  node: LSC.1043
+                  resourcePoolId: m7mlNkEskEu/9QvCAIrXYA==
+                  slotAttributeGroup: grp2
+                  tspID: 1234
+                  tspName: Fedex
+                  capabilityOptions:
+                    capabilityOption:
+                      optionType: AuthorityToLeave
+                - timeWindowId: ee1dcad8-1b1b-4b50-b12a-0c4e00526eb3
+                  capacityAvailable: true
+                  date: 2018-09-25T00:00:00.000+0000
+                  node: LSC.1043
+                  resourcePoolId: m7mlNkEskEu/9QvCAIrXYA==
+                  slotAttributeGroup: grp2
+                  tspID: 1234
+                  tspName: Fedex
+                - timeWindowId: cg1dcad8-1b1b-4b50-b12a-0c4e00526eb3
+                  capacityAvailable: true
+                  date: 2018-09-26T00:00:00.000+0000
+                  node: LSC.1043
+                  resourcePoolId: m7mlNkEskEu/9QvCAIrXYA==
+                  slotAttributeGroup: grp2
+                  tspID: 1234
+                  tspName: Fedex
+                - timeWindowId: ci1dcad8-1b1b-4b50-b12a-0c4e00526eb
+                  capacityAvailable: true
+                  date: 2018-09-27T00:00:00.000+0000
+                  node: LSC.1043
+                  resourcePoolId: m7mlNkEskEu/9QvCAIrXYA==
+                  slotAttributeGroup: grp2
+                  tspID: 1234
+                  tspName: Fedex
+        slotAttributeGroup:
+        - id: grp1
+          isExceptionalQty: false
+          isExceptionalVolume: false
+          node: LSC.1004
+          itemLine:
+          - id: 1
+            shipNode: CDC.269
+            isExceptionalQty: false
+        - id: grp2
+          isExceptionalQty: false
+          isExceptionalVolume: false
+          node: LSC.1043
+          itemLine:
+          - id: 2
+            shipNode: CDC.027
+            isExceptionalQty: false
+      itemLines:
+        itemLine:
+        - id: 1
+          shipNode: CDC.269
+          isExceptionalQty: false
+        - id: 2
+          shipNode: CDC.027
+          isExceptionalQty: false
+  deliveryModel:
+    type: array
+    description: Delivery with the time slot details listed.
+    items:
+      $ref: '#/definitions/deliveryModel_inner'
+    example:
+      selectedSolution:
+      - solutionId: PUP~1~STANDARD
+        deliveryLines:
+          deliveryLine:
+          - deliveryId: PUP~1~1
+            rangeOfDays: true
+            serviceSearchWindow: 7
+            pupIdentifier: PUP1004 Oxford 4 TSP B@IKEATSPBGB
+            isExceptionalQty: false
+            isExceptionalVolume: false
+            slots:
+              timeZone: Europe/London
+              slot:
+              - endTime: 61200
+                startTime: 08:00:00
+                availableDates:
+                  availableDate:
+                  - timeWindowId: d904a57a-eea5-484f-b8b0-0c3800527cc1
+                    rangeStartDate: 2020-11-18T00:00:00.000+0000
+                    rangeEndDate: 2020-11-24T00:00:00.000+0000
+                    capacityAvailable: true
+                    date: 2018-09-21T00:00:00.000+0000
+                    node: LSC.1004
+                    resourcePoolId: S7j7lEs+sk6brwmOAOXRkA==
+                    slotAttributeGroup: grp1
+                    tspID: 1234
+                    tspName: Fedex
+                  - timeWindowId: d904a57a-eea5-484f-b8b0-0c3800527cc2
+                    capacityAvailable: true
+                    date: 2018-09-22T00:00:00.000+0000
+                    node: LSC.1004
+                    resourcePoolId: S7j7lEs+sk6brwmOAOXRkA==
+                    slotAttributeGroup: grp1
+                    tspID: 1234
+                    tspName: Fedex
+                  - timeWindowId: d904a57a-eea5-484f-b8b0-0c3800527cc3
+                    capacityAvailable: true
+                    date: 2018-09-23T00:00:00.000+0000
+                    node: LSC.1004
+                    resourcePoolId: S7j7lEs+sk6brwmOAOXRkA==
+                    slotAttributeGroup: grp1
+                    tspID: 1234
+                    tspName: Fedex
+                  - timeWindowId: d904a57a-eea5-484f-b8b0-0c3800527cc4
+                    capacityAvailable: true
+                    date: 2018-09-24T00:00:00.000+0000
+                    node: LSC.1004
+                    resourcePoolId: S7j7lEs+sk6brwmOAOXRkA==
+                    slotAttributeGroup: grp1
+                    tspID: 1234
+                    tspName: Fedex
+                  - timeWindowId: d904a57a-eea5-484f-b8b0-0c3800527cc5
+                    capacityAvailable: true
+                    date: 2018-09-25T00:00:00.000+0000
+                    node: LSC.1004
+                    resourcePoolId: S7j7lEs+sk6brwmOAOXRkA==
+                    slotAttributeGroup: grp1
+                    tspID: 1234
+                    tspName: Fedex
+                  - timeWindowId: d904a57a-eea5-484f-b8b0-0c3800527cc6
+                    capacityAvailable: true
+                    date: 2018-09-26T00:00:00.000+0000
+                    node: LSC.1004
+                    resourcePoolId: S7j7lEs+sk6brwmOAOXRkA==
+                    slotAttributeGroup: grp1
+                    tspID: 1234
+                    tspName: Fedex
+                  - timeWindowId: d904a57a-eea5-484f-b8b0-0c3800527cc7
+                    capacityAvailable: true
+                    date: 2018-09-27T00:00:00.000+0000
+                    node: LSC.1004
+                    resourcePoolId: S7j7lEs+sk6brwmOAOXRkA=
+                    slotAttributeGroup: grp1
+                    tspID: 1234
+                    tspName: Fedex
+              - endTime: 72000
+                startTime: 43200
+                availableDates:
+                  availableDate:
+                  - timeWindowId: e904a57a-eea5-484f-b8b0-0c3800527cc1
+                    capacityAvailable: true
+                    date: 2018-09-21T00:00:00.000+0000
+                    node: LSC.1004
+                    resourcePoolId: FG5VUhFTd0qRVAuNAO8JZw==
+                    slotAttributeGroup: grp1
+                    tspID: 1234
+                    tspName: Fedex
+                  - timeWindowId: e904a57a-eea5-484f-b8b0-0c3800527cc2
+                    capacityAvailable: true
+                    date: 2018-09-22T00:00:00.000+0000
+                    node: LSC.1004
+                    resourcePoolId: FG5VUhFTd0qRVAuNAO8JZw==
+                    slotAttributeGroup: grp1
+                    tspID: 1234
+                    tspName: Fedex
+                  - timeWindowId: e904a57a-eea5-484f-b8b0-0c3800527cc3
+                    capacityAvailable: true
+                    date: 2018-09-23T00:00:00.000+0000
+                    node: LSC.1004
+                    resourcePoolId: FG5VUhFTd0qRVAuNAO8JZw==
+                    slotAttributeGroup: grp1
+                    tspID: 1234
+                    tspName: Fedex
+                  - timeWindowId: e904a57a-eea5-484f-b8b0-0c3800527cc4
+                    capacityAvailable: true
+                    date: 2018-09-24T00:00:00.000+0000
+                    node: LSC.1004
+                    resourcePoolId: FG5VUhFTd0qRVAuNAO8JZw==
+                    slotAttributeGroup: grp1
+                    tspID: 1234
+                    tspName: Fedex
+                  - timeWindowId: e904a57a-eea5-484f-b8b0-0c3800527cc5
+                    capacityAvailable: true
+                    date: 2018-09-25T00:00:00.000+0000
+                    node: LSC.1004
+                    resourcePoolId: FG5VUhFTd0qRVAuNAO8JZw==
+                    slotAttributeGroup: grp1
+                    tspID: 1234
+                    tspName: Fedex
+                  - timeWindowId: e904a57a-eea5-484f-b8b0-0c3800527cc6
+                    capacityAvailable: true
+                    date: 2018-09-26T00:00:00.000+0000
+                    node: LSC.1004
+                    resourcePoolId: FG5VUhFTd0qRVAuNAO8JZw==
+                    slotAttributeGroup: grp1
+                    tspID: 1234
+                    tspName: Fedex
+                  - timeWindowId: e904a57a-eea5-484f-b8b0-0c3800527cc7
+                    capacityAvailable: true
+                    date: 2018-09-27T00:00:00.000+0000
+                    node: LSC.1004
+                    resourcePoolId: FG5VUhFTd0qRVAuNAO8JZw==
+                    slotAttributeGroup: grp1
+                    tspID: 1234
+                    tspName: Fedex
+                    capabilityOptions:
+                      capabilityOption:
+                        optionType: AuthorityToLeave
+          - deliveryId: PUP~1~2
+            serviceSearchWindow: 7
+            reqstartDate: 2019-01-21T07:00:00.000+0000
+            pupIdentifier: PUP1043 Oxford 4 TSP B@IKEATSPBGB
+            isExceptionalQty: false
+            isExceptionalVolume: false
+            error:
+            - errorUniqueExceptionId: 9.151.77.25315526462535270000000000004
+              errorDescription: No Lastmile capacity available from Centiro
+              errorCode: EXTN_SOMTW_0003
+          slotAttributeGroup:
+          - id: grp1
+            isExceptionalQty: false
+            isExceptionalVolume: false
+            node: LSC.1004
+            itemLine:
+            - id: 1
+              shipNode: CDC.269
+              isExceptionalQty: false
+      itemLines:
+        itemLine:
+        - id: 1
+          shipNode: CDC.269
+          isExceptionalQty: false
+        - id: 2
+          shipNode: CDC.027
+          isExceptionalQty: false
+  slotModel:
+    type: array
+    description: available time window slots
+    items:
+      $ref: '#/definitions/slotModel_inner'
+  availableDateModel:
+    type: array
+    description: Available date for every time window slot
+    items:
+      $ref: '#/definitions/availableDateModel_inner'
+  capabilityOptionModel:
+    type: array
+    description: For Each Time window slot capability availabilities
+    items:
+      $ref: '#/definitions/capabilityOptionModel_inner'
+  itemLineModel:
+    type: array
+    description: Each item line contains article and required qty which is requested by customer
+    items:
+      $ref: '#/definitions/itemLineModel_inner'
+    example:
+    - id: 1
+      shipNode: CDC.269
+      isExceptionalQty: "N"
+    - id: 2
+      shipNode: CDC.269
+      isExceptionalQty: "N"
+    - id: 3
+      shipNode: CDC.005
+      isExceptionalQty: "N"
+  channelReferencesModel:
+    type: object
+    required:
+    - name
+    properties:
+      name:
+        type: string
+        example: iSell
+        description: This ia a mandatory attribute that specifies the name of the selling channel
+    description: details of the selling channel from which we have recieved the request.
+    example:
+      channelReferences:
+        name: iSell
+        visitorID: quwt5649iowkslhsgs6
+        checkoutID: po987gshbch9018276
+    additionalProperties:
+      type: string
+      description: One or multiple self-describing key names like the "visitorID", "checkoutID" or any other unique identifier which defines the channel in a "name":"value" pair
+  errorModel:
+    type: object
+    properties:
+      errorUniqueExceptionId:
+        type: string
+        example: 9.145.77.25315526462535270000000000004
+        description: Unique Identifier for each Exception
+      errorDescription:
+        type: string
+        example: Please send valid identifier for the selected Delivery Arrangement and Solution
+        description: Error Description
+      errorCode:
+        type: string
+        example: EXTN_SOMTW_0004
+        description: Unique SOM Error Code
+    description: Custom Exceptions thrown for Time Windows.
+    example:
+      error:
+      - errorUniqueExceptionId: 9.145.77.25315526462535270000000000004
+        errorDescription: Please send valid identifier for the selected Delivery Arrangement and Solution
+        errorCode: EXTN_SOMTW_0004
+  slotAttributeGroupModel:
+    type: array
+    description: Slot group associated with each delivery line
+    items:
+      $ref: '#/definitions/slotAttributeGroupModel_inner'
+    example:
+    - id: grp1
+      isExceptionalQty: false
+      isExceptionalVolume: false
+      node: LSC.1004
+      itemLine:
+      - id: 1
+        shipNode: CDC.269
+        isExceptionalQty: false
+    - id: grp2
+      isExceptionalQty: false
+      isExceptionalVolume: false
+      node: LSC.1043
+      itemLine:
+      - id: 2
+        shipNode: CDC.027
+        isExceptionalQty: false
+  timeWindowsRequest_selectedSolution_deliveryLines:
+    type: object
+    properties:
+      deliveryLine:
+        $ref: '#/definitions/deliveryModel'
+    description: Possible deliveries which can be used to deliver whole cart
+  timeWindowsRequest_selectedSolution:
+    type: object
+    required:
+    - deliveryLines
+    properties:
+      solutionId:
+        type: string
+        example: HD11
+        description: Unique identifier for each solution
+      deliveryLines:
+        $ref: '#/definitions/timeWindowsRequest_selectedSolution_deliveryLines'
+    description: Solution selected from the delivery arrangemnets response for which timewindows is requested
+  timeWindowsResponse_selectedSolution_deliveryLines:
+    type: object
+    properties:
+      deliveryLine:
+        $ref: '#/definitions/deliveryModel'
+    description: Possible deliveryLines which can be used to deliver whole cart
+  timeWindowsResponse_selectedSolution_slotAttributeGroups:
+    type: object
+    properties:
+      slotAttributeGroup:
+        $ref: '#/definitions/slotAttributeGroupModel'
+    description: Slot groups associated with deliveryLines which can be used to deliver whole cart
+  timeWindowsResponse_selectedSolution:
+    type: object
+    required:
+    - deliveryLines
+    properties:
+      solutionId:
+        type: string
+        example: HD~1~STANDARD
+        description: Unique identifier for each solution
+      deliveryLines:
+        $ref: '#/definitions/timeWindowsResponse_selectedSolution_deliveryLines'
+      slotAttributeGroups:
+        $ref: '#/definitions/timeWindowsResponse_selectedSolution_slotAttributeGroups'
+    description: Solution selected from the delivery arrangemnets response for which timewindows is requested
+  timeWindowsResponse_itemLines:
+    type: object
+    properties:
+      itemLine:
+        $ref: '#/definitions/itemLineModel'
+    description: List of item lines
+  deliveryModel_inner_slots:
+    type: object
+    properties:
+      timeZone:
+        type: string
+        example: Europe/London
+        description: Time zone of the service time windows
+      slot:
+        description: available time window slots
+        $ref: '#/definitions/slotModel'
+    description: List of available time window slots
+  deliveryModel_inner:
+    type: object
+    properties:
+      deliveryId:
+        type: string
+        example: HD~1~1
+        description: it is unique identifier given to each delivery line
+      rangeOfDays:
+        type: boolean
+        example: true
+        description: Indicates if the delivery is eligiable for Range of Days, this attribute can contain only true , if the delivery is not eligiable for ranges of days this flag will not be present in response
+      serviceSearchWindow:
+        type: number
+        format: int32
+        example: 7.0
+        description: The number of days to look for capacity from the earliest search date across all delivery options
+      reqstartDate:
+        type: string
+        format: date-time
+        example: 2019-01-21T07:00:00.000+0000
+        description: This along wit serviceSearchWindow provides reqEndDate. Look for the available time windows between reqStartDate + serviceSearchWindow
+      pupIdentifier:
+        type: string
+        example: PUP1004 Oxford 4 TSP B@IKEATSPBGB
+        description: Unique Identifier for the selected Pick Up Point. Its a combination of pupID@NetworkId
+      mergeOrderNo:
+        type: string
+        example: "1091424950"
+        description: This is order number of the regular sales order to which transport desk order in getting merged This is an optional field and will be passed only in 1.3.1 order merge
+      mergeDeliveryNo:
+        type: string
+        example: "1"
+        description: Prime line number of the delivery(DS line) which is getting merged with Transport desk delivery
+      slots:
+        $ref: '#/definitions/deliveryModel_inner_slots'
+      isExceptionalQty:
+        type: boolean
+        description: Flag to indicate if it is an exceptional qty
+        default: false
+      isExceptionalVolume:
+        type: boolean
+        description: Flag to indicate if it is an exceptional volume
+        default: false
+      returnMultipleSrvcSlots:
+        type: boolean
+        description: Flag to override returnMultipleSrvcSlots defined in root level
+        default: false
+      error:
+        $ref: '#/definitions/errorModel'
+  slotModel_inner_availableDates:
+    type: object
+    properties:
+      availableDate:
+        $ref: '#/definitions/availableDateModel'
+    description: Available dates of the time window
+  slotModel_inner:
+    type: object
+    properties:
+      startTime:
+        type: string
+        example: 08:00:00
+        description: Time when the service time window starts
+      endTime:
+        type: string
+        example: "61200"
+        description: Time when the service time window ends
+      availableDates:
+        $ref: '#/definitions/slotModel_inner_availableDates'
+  availableDateModel_inner_capabilityOptions:
+    type: object
+    properties:
+      capabilityOption:
+        $ref: '#/definitions/capabilityOptionModel'
+    description: Available capabilities of the time window
+  availableDateModel_inner:
+    type: object
+    properties:
+      capacityAvailable:
+        type: boolean
+        description: Flag to indicate if a single time window should be returned or multiple time windows.
+        default: false
+      date:
+        type: string
+        format: date
+        example: 2018-09-21T00:00:00.000+0000
+        description: Date of the time window
+      rangeStartDate:
+        type: string
+        format: date
+        example: 2020-11-18T00:00:00.000+0000
+        description: Range Start Date of the time window for Range of days
+      rangeEndDate:
+        type: string
+        format: date
+        example: 2020-11-24T00:00:00.000+0000
+        description: Range End Date of the time window for Range of days
+      node:
+        type: string
+        example: LSC.1004
+        description: Node of the service provider where service will be executed.
+      resourcePoolId:
+        type: string
+        example: 4ofK2kZLfkSdcgwGAI3qOg==
+        description: Unique Identifier of the associated resource pool
+      timeWindowId:
+        type: string
+        example: d904a57a-eea5-484f-b8b0-0c3800527cc2
+        description: This is required by Centiro to identify slot during dispatch date calculation
+      slotAttributeGroup:
+        type: string
+        example: grp1
+        description: Unique Identifier of the associated slot group
+      tspID:
+        type: string
+        example: "1234"
+        description: Service Provider Id of the slot
+      tspName:
+        type: string
+        example: Fedex
+        description: Service Provider Name of the available slot
+      capabilityOptions:
+        $ref: '#/definitions/availableDateModel_inner_capabilityOptions'
+  capabilityOptionModel_inner:
+    type: object
+    properties:
+      optionType:
+        type: string
+        example: AuthorityToLeave
+        description: Type of the capability will be offered to the available slot
+  itemLineModel_inner:
+    type: object
+    properties:
+      id:
+        type: string
+        example: "1"
+        description: Each line of the whole cart is having one unique identifier
+      shipNode:
+        type: string
+        example: CDC.269
+        description: Node form which the article will be dispatched from
+      isExceptionalQty:
+        type: boolean
+        description: Flag to indicate it is an exceptional qty
+        default: false
+  slotAttributeGroupModel_inner:
+    type: object
+    properties:
+      id:
+        type: string
+        example: grp1
+        description: Unique identifier for each slot group
+      node:
+        type: string
+        example: LSC.1004
+        description: Node of the service provider where service will be executed.
+      isExceptionalQty:
+        type: boolean
+        description: Flag to indicate if it is an exceptional qty
+        default: false
+      isExceptionalVolume:
+        type: boolean
+        description: Flag to indicate if it is an exceptional volume
+        default: false
+      itemLines:
+        $ref: '#/definitions/timeWindowsResponse_itemLines'
