@@ -1,4 +1,4 @@
-swagger: "2.0"
+openapi: "3.0.3"
 info:
   description: API to provide time windows for the delivery arrangement selected
   version: "1.0.12"
