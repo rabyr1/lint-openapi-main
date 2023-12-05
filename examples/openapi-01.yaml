@@ -26,37 +26,40 @@ paths:
       - Create Order Service
       operationId: IKEACreateOrderSync
       parameters:
-        - name: region
-          in: path
-          required: true
-          schema:
-            type: string
-
+      - name: region
+        in: path
+        required: true
+        type: string
+      - name: Authorization
+        in: header
+        required: true
+        type: string
+      - in: body
+        name: Create Order Service
+        description: Input to Create Order Service
+        required: true
+        schema:
+          $ref: '#/definitions/createOrder'
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/createOrder'
+              $ref: '#/components/schemas/retrieveOrderRequest'
       responses:
         "200":
           description: Successfully processed.
-          content:
-            application/json:
           schema:
-            $ref: '#/components/schemas/IKEACreateOrderSyncResponse'
+            $ref: '#/definitions/IKEACreateOrderSyncResponse'
         "400":
           description: Failed processing.
-          content:
-            application/problem+json:
           schema:
-            $ref: '#/components/schemas/error'
-components:
-  schemas:
+            $ref: '#/definitions/error'
+definitions:
   createOrder:
     type: object
     properties:
       order:
-        $ref: '#/components/schemas/createOrder_order'
+        $ref: '#/definitions/createOrder_order'
   parentLine:
     type: object
     required:
@@ -171,7 +174,7 @@ components:
     - orderLine
     properties:
       orderLine:
-        $ref: '#/components/schemas/orderLine'
+        $ref: '#/definitions/orderLine'
     description: contains the order line elements
   IKEACreateOrderSync_orderLineRelationships:
     type: object
@@ -179,7 +182,7 @@ components:
     - orderLineRelationship
     properties:
       orderLineRelationship:
-        $ref: '#/components/schemas/orderLineRelationship'
+        $ref: '#/definitions/orderLineRelationship'
     description: contains the list of OrderLineRelationship
   IKEACreateOrderSync_paymentMethods:
     type: object
@@ -187,13 +190,13 @@ components:
     - paymentMethod
     properties:
       paymentMethod:
-        $ref: '#/components/schemas/paymentMethod_inner'
+        $ref: '#/definitions/paymentMethod_inner'
     description: contains the list of paymentMethod
   paymentMethod_inner:
     type: array
     description: payment
     items:
-      $ref: '#/components/schemas/paymentMethod'
+      $ref: '#/definitions/paymentMethod'
   IKEACreateOrderSync_personInfoShipTo:
     type: object
     required:
@@ -309,7 +312,7 @@ components:
         example: CT10 1DP
         description: The post/zip code in the address.
       extn:
-        $ref: '#/components/schemas/IKEACreateOrderSync_personInfoShipTo_extn'
+        $ref: '#/definitions/IKEACreateOrderSync_personInfoShipTo_extn'
     description: personInfoShipTo details
   IKEACreateOrderSync_personInfoShipTo_extn:
     type: object
@@ -489,7 +492,7 @@ components:
         example: CT10 1DP
         description: The post/zip code in the address.
       extn:
-        $ref: '#/components/schemas/IKEACreateOrderSync_personInfoBillTo_extn'
+        $ref: '#/definitions/IKEACreateOrderSync_personInfoBillTo_extn'
     description: personInfoBillTo details
   IKEACreateOrderSync_personInfoBillTo_extn:
     type: object
@@ -587,25 +590,25 @@ components:
         example: "202204271848"
         description: This attribute only applies to   (ItemGroupCode=PROD) lines of full serve order for now in case in future basket level reservation for other types of sales order then this field can be reused
       item:
-        $ref: '#/components/schemas/orderLine_inner_item'
+        $ref: '#/definitions/orderLine_inner_item'
       linePriceInfo:
-        $ref: '#/components/schemas/orderLine_inner_linePriceInfo'
+        $ref: '#/definitions/orderLine_inner_linePriceInfo'
       lineTaxes:
-        $ref: '#/components/schemas/orderLines_lineTaxes'
+        $ref: '#/definitions/orderLines_lineTaxes'
       references:
-        $ref: '#/components/schemas/orderLine_references'
+        $ref: '#/definitions/orderLine_references'
       orderHoldTypes:
-        $ref: '#/components/schemas/orderLines_orderHoldTypes'
+        $ref: '#/definitions/orderLines_orderHoldTypes'
       bundleParentLine:
-        $ref: '#/components/schemas/orderLines_bundleParentLine'
+        $ref: '#/definitions/orderLines_bundleParentLine'
       referenceArticles:
-        $ref: '#/components/schemas/orderLines_referenceArticles'
+        $ref: '#/definitions/orderLines_referenceArticles'
       workOrderAppointments:
-        $ref: '#/components/schemas/orderLines_workOrderAppointments'
+        $ref: '#/definitions/orderLines_workOrderAppointments'
       extn:
-        $ref: '#/components/schemas/orderLines_extn'
+        $ref: '#/definitions/orderLines_extn'
       additionalAddresses:
-        $ref: '#/components/schemas/orderLines_additionalAddresses'
+        $ref: '#/definitions/orderLines_additionalAddresses'
     description: contains orderline info
   IKEACreateOrderSync_headerCharges:
     type: object
@@ -613,11 +616,11 @@ components:
     - headerCharge
     properties:
       headerCharge:
-        $ref: '#/components/schemas/headerCharge_inner'
+        $ref: '#/definitions/headerCharge_inner'
   headerCharge_inner:
     type: array
     items:
-      $ref: '#/components/schemas/headerCharge'
+      $ref: '#/definitions/headerCharge'
   headerCharge:
     type: object
     required:
@@ -650,11 +653,11 @@ components:
     - headerTax
     properties:
       headerTax:
-        $ref: '#/components/schemas/headerTax_inner'
+        $ref: '#/definitions/headerTax_inner'
   headerTax_inner:
     type: array
     items:
-      $ref: '#/components/schemas/headerTax'
+      $ref: '#/definitions/headerTax'
   headerTax:
     type: object
     required:
@@ -675,11 +678,11 @@ components:
     type: object
     properties:
       fileAttachment:
-        $ref: '#/components/schemas/fileAttachment_inner'
+        $ref: '#/definitions/fileAttachment_inner'
   fileAttachment_inner:
     type: array
     items:
-      $ref: '#/components/schemas/fileAttachment'
+      $ref: '#/definitions/fileAttachment'
   fileAttachment:
     type: object
     properties:
@@ -697,7 +700,7 @@ components:
         format: 'maximum length: 100'
         description: 'Complete name of the file as returned by FileUploadServlet '
       extn:
-        $ref: '#/components/schemas/fileAttachment_extn'
+        $ref: '#/definitions/fileAttachment_extn'
   fileAttachment_extn:
     type: object
     properties:
@@ -721,11 +724,11 @@ components:
     - note
     properties:
       note:
-        $ref: '#/components/schemas/note_inner'
+        $ref: '#/definitions/note_inner'
   note_inner:
     type: array
     items:
-      $ref: '#/components/schemas/note'
+      $ref: '#/definitions/note'
   note:
     type: object
     properties:
@@ -739,7 +742,7 @@ components:
         example: 1
         description: The sequence of the note.
       extn:
-        $ref: '#/components/schemas/noteExtn'
+        $ref: '#/definitions/noteExtn'
   noteExtn:
     type: object
     properties:
@@ -757,11 +760,11 @@ components:
     - answerSet
     properties:
       answerSet:
-        $ref: '#/components/schemas/answerSet_inner'
+        $ref: '#/definitions/answerSet_inner'
   answerSet_inner:
     type: array
     items:
-      $ref: '#/components/schemas/answerSet'
+      $ref: '#/definitions/answerSet'
   answerSet:
     type: object
     required:
@@ -773,7 +776,7 @@ components:
         format: 'maximum length: 20'
         description: The question type associated to the defined answer set
       answers:
-        $ref: '#/components/schemas/answerSet_answers'
+        $ref: '#/definitions/answerSet_answers'
   answerSet_answers:
     type: object
     required:
@@ -782,7 +785,7 @@ components:
       answer:
         type: array
         items:
-          $ref: '#/components/schemas/answerSet_answers_answer'
+          $ref: '#/definitions/answerSet_answers_answer'
   answerSet_answers_answer:
     type: object
     required:
@@ -798,18 +801,18 @@ components:
         format: 'maximum length: 20'
         description: Identifier for the question that this answer is for.
       extn:
-        $ref: '#/components/schemas/answerSet_answers_answer_extn'
+        $ref: '#/definitions/answerSet_answers_answer_extn'
   orderLines_lineTaxes:
     type: object
     required:
     - lineTax
     properties:
       lineTax:
-        $ref: '#/components/schemas/orderLines_tax_inner'
+        $ref: '#/definitions/orderLines_tax_inner'
   orderLines_tax_inner:
     type: array
     items:
-      $ref: '#/components/schemas/orderLines_tax'
+      $ref: '#/definitions/orderLines_tax'
   orderLines_tax:
     type: object
     required:
@@ -838,11 +841,11 @@ components:
     - lineTax
     properties:
       lineTax:
-        $ref: '#/components/schemas/orderLineRefArticle_tax_inner'
+        $ref: '#/definitions/orderLineRefArticle_tax_inner'
   orderLineRefArticle_tax_inner:
     type: array
     items:
-      $ref: '#/components/schemas/orderLineRefArticle_tax'
+      $ref: '#/definitions/orderLineRefArticle_tax'
   orderLineRefArticle_tax:
     type: object
     required:
@@ -878,7 +881,7 @@ components:
   orderLine:
     type: array
     items:
-      $ref: '#/components/schemas/orderLine_inner'
+      $ref: '#/definitions/orderLine_inner'
   orderLines_extn:
     type: object
     properties:
@@ -980,11 +983,11 @@ components:
         example: ID_CHECK_REQUIRED
         description: any additional information pass to external systems
       capabilityList:
-        $ref: '#/components/schemas/orderLines_extn_capabilityList'
+        $ref: '#/definitions/orderLines_extn_capabilityList'
   capability_inner:
     type: array
     items:
-      $ref: '#/components/schemas/capability'
+      $ref: '#/definitions/capability'
   capability:
     type: object
     required:
@@ -1000,11 +1003,11 @@ components:
     - orderHoldType
     properties:
       orderHoldType:
-        $ref: '#/components/schemas/orderLines_orderHoldType_inner'
+        $ref: '#/definitions/orderLines_orderHoldType_inner'
   orderLines_orderHoldType_inner:
     type: array
     items:
-      $ref: '#/components/schemas/orderLines_orderHoldType'
+      $ref: '#/definitions/orderLines_orderHoldType'
   orderLines_orderHoldType:
     type: object
     required:
@@ -1032,11 +1035,11 @@ components:
     type: object
     properties:
       referenceArticle:
-        $ref: '#/components/schemas/orderLines_referenceArticle_inner'
+        $ref: '#/definitions/orderLines_referenceArticle_inner'
   orderLines_referenceArticle_inner:
     type: array
     items:
-      $ref: '#/components/schemas/orderLines_referenceArticle'
+      $ref: '#/definitions/orderLines_referenceArticle'
   orderLines_referenceArticle:
     type: object
     required:
@@ -1076,16 +1079,16 @@ components:
         format: 'decimal (minimum value: 0 total number of digits: 15 fraction digits: 2)'
         description: The unit price for the order line - TAX exclusive.
       lineTaxes:
-        $ref: '#/components/schemas/orderLineRefArticle_lineTaxes'
+        $ref: '#/definitions/orderLineRefArticle_lineTaxes'
   orderLines_workOrderAppointments:
     type: object
     properties:
       workOrderAppointment:
-        $ref: '#/components/schemas/orderLines_workOrderAppointment_inner'
+        $ref: '#/definitions/orderLines_workOrderAppointment_inner'
   orderLines_workOrderAppointment_inner:
     type: array
     items:
-      $ref: '#/components/schemas/orderLines_workOrderAppointment'
+      $ref: '#/definitions/orderLines_workOrderAppointment'
   orderLines_workOrderAppointment:
     type: object
     properties:
@@ -1117,15 +1120,15 @@ components:
     - additionalAddress
     properties:
       additionalAddress:
-        $ref: '#/components/schemas/additionalAddresses_inner'
+        $ref: '#/definitions/additionalAddresses_inner'
   additionalAddresses_inner:
     type: array
     items:
-      $ref: '#/components/schemas/additionalAddress_inner'
+      $ref: '#/definitions/additionalAddress_inner'
   additionalAddress_inner:
     properties:
       personInfo:
-        $ref: '#/components/schemas/additionalAddress_personInfo'
+        $ref: '#/definitions/additionalAddress_personInfo'
   additionalAddress_personInfo:
     type: object
     properties:
@@ -1180,7 +1183,7 @@ components:
         example: lastName
         description: PuP name
       extn:
-        $ref: '#/components/schemas/personInfo_extn'
+        $ref: '#/definitions/personInfo_extn'
   orderLineRelationship_inner:
     type: object
     required:
@@ -1193,14 +1196,14 @@ components:
         format: 'maximum length: 40'
         example: DELIVERY / SERVICE
       parentLine:
-        $ref: '#/components/schemas/parentLine'
+        $ref: '#/definitions/parentLine'
       childLine:
-        $ref: '#/components/schemas/childLine'
+        $ref: '#/definitions/childLine'
     description: The type of relationship between the parent and the child line. There is no validation for the RelationshipType attribute.
   orderLineRelationship:
     type: array
     items:
-      $ref: '#/components/schemas/orderLineRelationship_inner'
+      $ref: '#/definitions/orderLineRelationship_inner'
   IKEACreateOrderSyncResponse:
     type: object
     properties:
@@ -1224,7 +1227,7 @@ components:
         example: "400"
         description: It will give you the  code as 200 for success and 400 for the invalid request
       error:
-        $ref: '#/components/schemas/error_error'
+        $ref: '#/definitions/error_error'
   createOrder_order:
     type: object
     required:
@@ -1282,29 +1285,29 @@ components:
         example: ' INTERNET/ STORE/ FAX/ PHONE'
         description: The channel through which this order was created.
       extn:
-        $ref: '#/components/schemas/IKEACreateOrderSync_extn'
+        $ref: '#/definitions/IKEACreateOrderSync_extn'
       orderLines:
-        $ref: '#/components/schemas/IKEACreateOrderSync_orderLines'
+        $ref: '#/definitions/IKEACreateOrderSync_orderLines'
       orderLineRelationships:
-        $ref: '#/components/schemas/IKEACreateOrderSync_orderLineRelationships'
+        $ref: '#/definitions/IKEACreateOrderSync_orderLineRelationships'
       paymentMethods:
-        $ref: '#/components/schemas/IKEACreateOrderSync_paymentMethods'
+        $ref: '#/definitions/IKEACreateOrderSync_paymentMethods'
       personInfoShipTo:
-        $ref: '#/components/schemas/IKEACreateOrderSync_personInfoShipTo'
+        $ref: '#/definitions/IKEACreateOrderSync_personInfoShipTo'
       personInfoBillTo:
-        $ref: '#/components/schemas/IKEACreateOrderSync_personInfoBillTo'
+        $ref: '#/definitions/IKEACreateOrderSync_personInfoBillTo'
       headerCharges:
-        $ref: '#/components/schemas/IKEACreateOrderSync_headerCharges'
+        $ref: '#/definitions/IKEACreateOrderSync_headerCharges'
       priceInfo:
-        $ref: '#/components/schemas/IKEACreateOrderSync_priceInfo'
+        $ref: '#/definitions/IKEACreateOrderSync_priceInfo'
       headerTaxes:
-        $ref: '#/components/schemas/IKEACreateOrderSync_headerTaxes'
+        $ref: '#/definitions/IKEACreateOrderSync_headerTaxes'
       fileAttachments:
-        $ref: '#/components/schemas/IKEACreateOrderSync_fileAttachments'
+        $ref: '#/definitions/IKEACreateOrderSync_fileAttachments'
       notes:
-        $ref: '#/components/schemas/IKEACreateOrderSync_notes'
+        $ref: '#/definitions/IKEACreateOrderSync_notes'
       answerSets:
-        $ref: '#/components/schemas/IKEACreateOrderSync_answerSets'
+        $ref: '#/definitions/IKEACreateOrderSync_answerSets'
   orderLine_inner_item:
     type: object
     required:
@@ -1364,7 +1367,7 @@ components:
     - capability
     properties:
       capability:
-        $ref: '#/components/schemas/capability_inner'
+        $ref: '#/definitions/capability_inner'
   error_error:
     type: object
     properties:
