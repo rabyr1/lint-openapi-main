@@ -17,14 +17,6 @@ servers:
   - url: https://api.ingka.ikea.com/om/order-management/eu/create-order
     description: API Gateway PROD
   - url: https://api.ingka.ppe.ikeadt.com/om/order-management/eu/create-order
-schemes:
-- https
-consumes:
-- application/json
-produces:
-- application/json
-security:
-- Client ID: []
 paths:
   /{region}/create-order:
     post:
