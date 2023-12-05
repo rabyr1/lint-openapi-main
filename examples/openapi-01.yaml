@@ -48,12 +48,8 @@ paths:
       responses:
         "200":
           description: Successfully processed.
-          schema:
-            $ref: '#/definitions/IKEACreateOrderSyncResponse'
         "400":
           description: Failed processing.
-          schema:
-            $ref: '#/definitions/error'
 definitions:
   createOrder:
     type: object
