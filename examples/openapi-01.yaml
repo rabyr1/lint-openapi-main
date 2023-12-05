@@ -29,6 +29,9 @@ paths:
       - name: region
         in: path
         required: true
+        schema:
+            type: string
+
       - name: Authorization
         in: header
         required: true
