@@ -5,6 +5,9 @@ info:
   title: IKEACreateOrderSync
   contact:
     email: nikhila.kurmala@ingka.ikea.com
+  license:
+    name: INGKA GROUP INNER SOURCE LICENCE VERSION 1.0
+    url: https://github.com/ingka-group-digital/fom-ocm/tree/main/api/licence.md
 basePath: /om/order-management
 tags:
 - name: Create Order Service
