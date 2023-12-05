@@ -18,14 +18,6 @@ servers:
     description: API Gateway PROD
   - url: https://api.ingka.ppe.ikeadt.com/om/order-management/eu/create-order
     description: API Gateway STAGE
-schemes:
-- https
-consumes:
-- application/json
-produces:
-- application/json
-security:
-- Client ID: []
 paths:
   /{region}/create-order:
     post:
