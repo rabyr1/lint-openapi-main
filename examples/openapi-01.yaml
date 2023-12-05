@@ -29,7 +29,6 @@ paths:
       - name: region
         in: path
         required: true
-        type: string
       - name: Authorization
         in: header
         required: true
