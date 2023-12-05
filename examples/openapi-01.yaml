@@ -47,8 +47,6 @@ paths:
           description: Successfully processed.
         "400":
           description: Failed processing.
-          content:
-            application/problem+json:
 definitions:
   createOrder:
     type: object
