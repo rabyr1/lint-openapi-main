@@ -23,10 +23,6 @@ paths:
       tags:
       - Create Order Service
       operationId: IKEACreateOrderSync
-      consumes:
-      - application/json
-      produces:
-      - application/json
       parameters:
       - name: region
         in: path
