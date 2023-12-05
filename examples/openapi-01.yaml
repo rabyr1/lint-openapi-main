@@ -32,7 +32,6 @@ paths:
       - name: Authorization
         in: header
         required: true
-        type: string
       - in: body
         name: Create Order Service
         description: Input to Create Order Service
