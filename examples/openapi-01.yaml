@@ -45,23 +45,28 @@ paths:
         description: Input to Create Order Service
         required: true
         schema:
-          $ref: '#/definitions/createOrder'
+          $ref: '#/components/schemas/createOrder'
       responses:
         "200":
           description: Successfully processed.
+          content:
+            application/json:
           schema:
-            $ref: '#/definitions/IKEACreateOrderSyncResponse'
+            $ref: '#/components/schemas/IKEACreateOrderSyncResponse'
         "400":
           description: Failed processing.
+          content:
+            application/json:
           schema:
-            $ref: '#/definitions/error'
+            $ref: '#/components/schemas/error'
 securityDefinitions:
   Client ID:
     description: ""
     type: apiKey
     name: X-IBM-Client-Id
     in: header
-definitions:
+components:
+  schemas:
   createOrder:
     type: object
     properties:
