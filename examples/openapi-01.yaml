@@ -37,17 +37,11 @@ paths:
         required: true
         schema:
             type: string
-      - in: body
-        name: Create Order Service
-        description: Input to Create Order Service
-        required: true
-        schema:
-          $ref: '#/definitions/createOrder'
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/retrieveOrderRequest'
+              $ref: '#/definitions/createOrder'
       responses:
         "200":
           description: Successfully processed.
