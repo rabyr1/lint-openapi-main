@@ -8,10 +8,15 @@ info:
   license:
     name: INGKA GROUP INNER SOURCE LICENCE VERSION 1.0
     url: https://github.com/ingka-group-digital/fom-ocm/tree/main/api/licence.md
-basePath: /om/order-management
 tags:
 - name: Create Order Service
   description: create order service for iSOM
+servers:
+  - url: https://api.ingka.cte.ikeadt.com/om/order-management/eu/create-order
+    description: API Gateway DEV
+  - url: https://api.ingka.ikea.com/om/order-management/eu/create-order
+    description: API Gateway PROD
+  - url: https://api.ingka.ppe.ikeadt.com/om/order-management/eu/create-order
 schemes:
 - https
 consumes:
