@@ -21,7 +21,7 @@ servers:
 paths:
   /{region}/create-order:
     post:
-      summary: retrieve order Info for the Order
+      summary: create order Info for the Order
       tags:
       - Create Order Service
       operationId: IKEACreateOrderSync
