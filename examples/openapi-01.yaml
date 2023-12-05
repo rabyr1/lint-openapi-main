@@ -17,12 +17,24 @@ servers:
   - url: https://api.ingka.ikea.com/om/order-management/eu/create-order
     description: API Gateway PROD
   - url: https://api.ingka.ppe.ikeadt.com/om/order-management/eu/create-order
+schemes:
+- https
+consumes:
+- application/json
+produces:
+- application/json
+security:
+- Client ID: []
 paths:
   /{region}/create-order:
     post:
       tags:
       - Create Order Service
       operationId: IKEACreateOrderSync
+      consumes:
+      - application/json
+      produces:
+      - application/json
       parameters:
       - name: region
         in: path
@@ -47,6 +59,12 @@ paths:
           description: Failed processing.
           schema:
             $ref: '#/definitions/error'
+securityDefinitions:
+  Client ID:
+    description: ""
+    type: apiKey
+    name: X-IBM-Client-Id
+    in: header
 definitions:
   createOrder:
     type: object
