@@ -51,12 +51,6 @@ paths:
           description: Failed processing.
           schema:
             $ref: '#/definitions/error'
-securityDefinitions:
-  Client ID:
-    description: ""
-    type: apiKey
-    name: X-IBM-Client-Id
-    in: header
 definitions:
   createOrder:
     type: object
