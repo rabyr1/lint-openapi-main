@@ -47,7 +47,8 @@ paths:
           description: Successfully processed.
         "400":
           description: Failed processing.
-definitions:
+components:
+  schemas:
   createOrder:
     type: object
     properties:
