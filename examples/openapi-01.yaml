@@ -39,8 +39,16 @@ paths:
       responses:
         "200":
           description: Successfully processed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IKEACreateOrderSyncResponse'
         "400":
           description: Failed processing.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/error'
 components:
   schemas:
     createOrder:
