@@ -21,24 +21,22 @@ servers:
 paths:
   /{region}/create-order:
     post:
+      summary: retrieve order Info for the Order
       tags:
       - Create Order Service
       operationId: IKEACreateOrderSync
       parameters:
-      - name: region
-        in: path
-        required: true
-        type: string
-      - name: Authorization
-        in: header
-        required: true
-        type: string
-      - in: body
-        name: Create Order Service
-        description: Input to Create Order Service
-        required: true
-        schema:
-          $ref: '#/components/schemas/createOrder'
+        - name: region
+          in: path
+          required: true
+          schema:
+            type: string
+
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/createOrder'
       responses:
         "200":
           description: Successfully processed.
@@ -49,22 +47,16 @@ paths:
         "400":
           description: Failed processing.
           content:
-            application/json:
+            application/problem+json:
           schema:
             $ref: '#/components/schemas/error'
-securityDefinitions:
-  Client ID:
-    description: ""
-    type: apiKey
-    name: X-IBM-Client-Id
-    in: header
 components:
   schemas:
   createOrder:
     type: object
     properties:
       order:
-        $ref: '#/definitions/createOrder_order'
+        $ref: '#/components/schemas/createOrder_order'
   parentLine:
     type: object
     required:
