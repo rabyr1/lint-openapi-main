@@ -1525,3 +1525,10 @@ components:
     enforced: true
     testable: true
     phase: realized
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+security:
+  - bearerAuth: []
