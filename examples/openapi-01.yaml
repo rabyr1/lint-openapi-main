@@ -1230,6 +1230,8 @@ components:
             A short, summary of the problem type. Written in english and readable
             for engineers (usually not suited for non technical stakeholders and
             not localized); example: Service Unavailable
+        type:
+          type: string
     createOrder_order:
       type: object
       required:
