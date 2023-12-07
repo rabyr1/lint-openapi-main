@@ -8,7 +8,7 @@ info:
     email: dl.fulfillment.scrum.team.order_conception.se@ingka.com
   license:
     name: INGKA GROUP INNER SOURCE LICENCE VERSION 1.0
-    url: url: https://git.build.ingka.ikea.com/Sales-Order-Fulfilment/ISOMOFD-S10/blob/master/SOM-API/LICENSE.md
+    url: https://git.build.ingka.ikea.com/Sales-Order-Fulfilment/ISOMOFD-S10/blob/master/SOM-API/LICENSE.md
 tags:
 - name: Create Order Service
   description: create order service for iSOM
