@@ -18,6 +18,7 @@ servers:
   - url: https://api.ingka.ikea.com/om/order-management/eu/modify-order
     description: API Gateway PROD
   - url: https://api.ingka.ppe.ikeadt.com/om/order-management/eu/modify-order
+    description: API Gateway STAGE
 paths:
   /{region}/modify-order:
     post:
@@ -51,1349 +52,1350 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/modifyOrderErrorResponse'
-components/schemas:
-  modifyOrderRequest:
-    type: object
-    properties:
-      order:
-        $ref: '#/components/schemas/modifyOrderRequest_order'
-  order_extn:
-    type: object
-    required:
-    - deliveryArrangementsId
-    - isBusinessCustomer
-    - languageDemand
-    - officialLanguage
-    - orderNoSrc
-    - preferredCommunicationMethod
-    - preferredLanguage
-    - serviceProviderPreferredLocale
-    - serviceType
-    - totalAmount
-    - tspSettlementReasonCode
-    properties:
-      officialLanguage:
-        type: string
-        format: 'maximum length: 40'
-        example: en
-        description: officialLanguage
-      preferredLanguage:
-        type: string
-        format: 'maximum length: 40'
-        example: en
-        description: preferredLanguage
-      orderNoSrc:
-        type: string
-        format: 'maximum length: 40'
-        example: A01
-        description: Order number source.
-      serviceType:
-        type: string
-        format: 'maximum length: 24'
-        example: HOME_DELIVERY , PUOP, PUP, CLICK_COLLECT, LOCKER, CLICK_COLLECT_STORE
-        description: OrderService type for the request.
-      isBusinessCustomer:
-        type: string
-        format: 'maximum length: 1'
-        example: Y or N
-        description: is business customer
-      preferredCommunicationMethod:
-        type: string
-        format: 'maximum length: 40'
-        example: FAX/ EMAIL/ PHONE/ SMS/ ADDRESS
-        description: Customer's preferred communication method
-      serviceProviderPreferredLocale:
-        type: string
-        format: 'maximum length: 40'
-        example: en-US , sv-SE
-        description: Preferred locale of the customer
-      languageDemand:
-        type: string
-        format: 'maximum length: 20'
-        example: true/false
-        description: A true or false indicator on whether the customer has demanded a certain language to be used.
-      totalAmount:
-        type: integer
-        format: ExternalAmount
-        example: "20.0"
-        description: Total Amount Excluding Discounts
-      deliveryArrangementsId:
-        type: string
-        format: 'maximum length: 40'
-        example: "20200908141240087100777"
-        description: Delivery Arrangement Id used while placing the order.
-      tspSettlementReasonCode:
-        type: string
-        format: 'maximum length: 50'
-        example: FAILED_CUSTOMER, FAILED_IKEA, FAILED_TSP
-        description: tspSettlementReasonCode is optional field from L�mna for Cutomer Return during full cancellation.
-  order_orderLines:
-    type: object
-    required:
-    - orderLine
-    properties:
-      orderLine:
-        type: array
-        items:
-          $ref: '#/components/schemas/orderLine'
-  orderLine:
-    type: object
-    required:
-    - action
-    - additionalAddresses
-    - extn
-    - item
-    - itemGroupCode
-    - levelOfService
-    - linePriceInfo
-    - lineTaxes
-    - mergeNode
-    - orderHoldTypes
-    - orderedQty
-    - primeLineNo
-    - promisedApptEndDate
-    - promisedApptStartDate
-    - references
-    - reqDeliveryDate
-    - shipNode
-    - status
-    - workOrderAppointments
-    properties:
-      action:
-        type: string
-        format: 'maximum length: 40'
-        example: CANCEL/CREATE/MODIFY
-        description: Type of modification performed on the orderline
-      itemGroupCode:
-        type: string
-        format: 'maximum length: 20'
-        example: PROD/DS/PS
-        description: Specifies whether the article is a product, delivery, or provided service type.
-      levelOfService:
-        type: string
-        format: 'maximum length: 40'
-        example: SGR90000897
-        description: 'Indicates the level of service required for this order line. Note: This should not be populated at DS/PS line level'
-      orderedQty:
-        type: integer
-        format: 'decimal (minimum value: 0 total number of digits: 9 fraction digits: 2) '
-        example: 10
-        description: The quantity of the line item that is being ordered.
-      primeLineNo:
-        type: integer
-        format: 'nonNegativeInteger (total number of digits: 5) '
-        example: 2
-        description: The order line number. Part of an OrderLine's unique key.
-      reqDeliveryDate:
-        type: string
-        format: dateTime
-        example: 020-08-11T18:00:00.000Z
-        description: if iSell is not sending this value is same as PromisedApptStartDate at line level
-      shipNode:
-        type: string
-        format: 'maximum length: 24'
-        example: CDC.030
-        description: Ship node from which the order line will be fulfilled.
-      mergeNode:
-        type: string
-        format: 'maximum length: 24'
-        example: LSC.258
-        description: This is the node where these lines are merged before final delivery
-      promisedApptStartDate:
-        type: string
-        format: dateTime
-        example: 2020-08-12T16:00:00.000Z
-        description: The date and time when the appointment starts for an OrderLine.This date only applies to both Delivery (ItemGroupCode=DS) and Provided (ItemGroupCode=PS) lines for ISOM.
-      promisedApptEndDate:
-        type: string
-        format: dateTime
-        example: 2020-08-12T07:00:00.000Z
-        description: The date and time when the appointment ends for an OrderLine. This date only applies to Delivery  (ItemGroupCode=DS) and Provided (ItemGroupCode=PS) lines for ISOM.
-      timezone:
-        type: string
-        format: 'maximum length: 40'
-        example: Europe/London
-        description: The timezone in which the promised appointment has been recorded. This attribute only applies to  Provided (ItemGroupCode=PS) and  (ItemGroupCode=DS) lines.
-      tmallReservationId:
-        type: string
-        format: 'maximum length: 40'
-        example: 'TMALL202204271848'
-        description: This attribute only applies to (ItemGroupCode=PROD) lines and Tmall reservation id.        
-      status:
-        type: string
-        format: 'maximum length: 40'
-        example: 3700.01.100
-        description: Maximum order line status among all records that belong to an order.
-      item:
-        $ref: '#/components/schemas/orderLine_item'
-      linePriceInfo:
-        $ref: '#/components/schemas/orderLine_linePriceInfo'
-      references:
-        $ref: '#/components/schemas/orderLine_references'
-      lineTaxes:
-        $ref: '#/components/schemas/orderLine_lineTaxes'
-      orderHoldTypes:
-        $ref: '#/components/schemas/orderLine_orderHoldTypes'
-      workOrderAppointments:
-        $ref: '#/components/schemas/orderLine_workOrderAppointments'
-      extn:
-        $ref: '#/components/schemas/orderLine_extn'
-      additionalAddresses:
-        $ref: '#/components/schemas/orderLine_additionalAddresses'
-    description: Contains orderline information.
-  orderLine_lineTaxes:
-    type: object
-    required:
-    - lineTax
-    properties:
-      lineTax:
-        type: array
-        items:
-          $ref: '#/components/schemas/lineTax'
-  lineTax:
-    type: object
-    required:
-    - tax
-    - taxName
-    - taxPercentage
-    properties:
-      taxName:
-        type: string
-        format: 'maximum length: 40'
-        example: VAT
-        description: Type of tax.
-      taxPercentage:
-        type: integer
-        format: 'decimal (minimum value: 0 total number of digits: 8 fraction digits: 5'
-        example: "2.50"
-        description: Percentage amount for tax calculation.
-      tax:
-        type: integer
-        format: 'decimal (total number of digits: 15 fraction digits: 2)'
-        example: "12.50"
-        description: 'The tax amount.� '
-  orderLine_orderHoldTypes:
-    type: object
-    required:
-    - orderHoldType
-    properties:
-      orderHoldType:
-        type: array
-        items:
-          $ref: '#/components/schemas/orderHoldType'
-  orderHoldType:
-    type: object
-    required:
-    - holdType
-    - status
-    properties:
-      holdType:
-        type: string
-        format: ' maxlength - 20'
-        example: ReadyToAssignHold/ ExceptionVolumeHold/ ExceptionQtyHold
-        description: Hold type to be applied
-      status:
-        type: string
-        format: ' maxlength - 15'
-        example: 1100 / 1300
-        description: Status of the order hold type
-  orderLine_workOrderAppointments:
-    type: object
-    required:
-    - workOrderAppointment
-    properties:
-      workOrderAppointment:
-        type: array
-        items:
-          $ref: '#/components/schemas/workOrderAppointment'
-  workOrderAppointment:
-    type: object
-    required:
-    - capacityAllocated
-    - promisedApptEndDate
-    - promisedApptStartDate
-    - timeWindowID
-    - timeZone
-    properties:
-      timeWindowID:
-        type: string
-        description: TimeWindowID sent by sterling during timewindow call will be sent back. This only for PS line.
-      capacityAllocated:
-        type: integer
-        format: 'decimal (total number of digits: 5 fraction digits: 2)'
-        description: A new custom field to store and send the capacity units to centiro. The value is sent down from Isell to ISOM. There is no business logic involved in Isom on this field. This only for PS line.
-      promisedApptStartDate:
-        type: string
-        format: dateTime
-        example: 2020-08-12T16:00:00.000Z
-        description: The date and time when the appointment starts for an OrderLine.This date only applies to both Delivery (ItemGroupCode=DS) and Provided (ItemGroupCode=PS) lines for ISOM. Note:this is required attribute for DS,PS line time
-      promisedApptEndDate:
-        type: string
-        format: dateTime
-        example: 2020-08-12T07:00:00.000Z
-        description: The date and time when the appointment ends for an OrderLine. This date only applies to Delivery  (ItemGroupCode=DS) and Provided (ItemGroupCode=PS) lines for ISOM. Note:this is required attribute for DS,PS line time
-      timeZone:
-        type: string
-        format: 'maximum length: 40'
-        example: Europe/London
-        description: The timeZone in which the promised appointment has been recorded. This attribute only applies to  Provided (ItemGroupCode=PS) and  (ItemGroupCode=DS) lines.
-  orderLine_extn:
-    type: object
-    required:
-    - capabilityList
-    - custProjId
-    - custProjManuUrl
-    - custProjSrc
-    - failedReasonCode
-    - failedReasonCodeTimeStamp
-    - handInLocation
-    - handInUser
-    - hasCustomWorktopDrawing
-    - hasExceptionQty
-    - identifier
-    - isIntegratedCashLine
-    - isPicked
-    - originalDSLineNo
-    - payTo
-    - paymentCutOffDateTime
-    - resourcePoolId
-    - serviceProviderId
-    - splitGroupId
-    - timeWindowID
-    - totalDeliveryPrice
-    - twChangeReasonCode
-    - tspSettlementReasonCode
-    - additinalInfo
-    properties:
-      hasExceptionQty:
-        type: string
-        format: 'maximum length: 1'
-        example: "Y"
-        description: Exception quantity flag
-      resourcePoolId:
-        type: string
-        example: hW8K596rS0+XYg6SANsGfQ==
-        description: Resource pool ID for serviceline
-      hasCustomWorktopDrawing:
-        type: string
-        format: 'maximum length: 1'
-        example: "Y"
-        description: Flag indicating if item has an associated worktop drawing
-      timeWindowID:
-        type: string
-        format: 'maximum length: 36'
-        example: 5d3ffed7-212f-4851-8d44-0e9300528951
-        description: TimeWindowID required by Centiro to identify slot during dispatch date calculation
-      totalDeliveryPrice:
-        type: integer
-        format: 'decimal (minimum value: 0 total number of digits: 19 fraction digits: 6)'
-        example: "25.50"
-        description: Total price of items and delivery part of this delivery service. Applied only for services
-      identifier:
-        type: string
-        format: Identifier
-        description: Identifier for Network id for PuP service provider
-      custProjId:
-        type: string
-        format: 'maximum length: 50'
-        example: MyIkeaProject01
-        description: 'Identifier for the customer project Note: If this data is not present, no need to send them.'
-      custProjSrc:
-        type: string
-        format: 'maximum length: 25'
-        example: IHP3, CWT
-        description: 'Field indicating the source system for the project''s associated worktop drawing Note: If this data is not present, no need to send them.'
-      custProjManuUrl:
-        type: string
-        format: 'maximum length: 255'
-        example: manuinfo.ihp3.ikea.com/?ru=SE?Project=���
-        description: 'An URL pointing to where supplier can find the actual manufactoring information Note: If this data is not present, no need to send them.'
-      payTo:
-        type: string
-        format: 'maximum length: 20'
-        example: PAY_TO_IKEA/PAY_TO_SP
-        description: A new custom field to identify to whom the payment has to be made for the service provided. Valid values are PAY_TO_KEA and PAY_TO_SP. If this data is not present, no need to send them.
-      serviceProviderId:
-        type: string
-        format: 'maximum length: 80'
-        example: pd18a30c-ecfb-4272-9f1c-0b6900b550
-        description: 'A new custom field to store and send the service provider reference to centiro. The value is sent down from Isell to ISOM. '
-      handInLocation:
-        type: string
-        format: 'maximum length: 250'
-        description: A new custom field to identify the  HandInLocation for Transport Desk Orders
-      handInUser:
-        type: string
-        format: 'maximum length: 150'
-        description: A new custom field to identify the  HandInUser for Transport Desk Orders
-      isPicked:
-        type: string
-        format: 'maximum length: 1 (flag)'
-        example: "Y"
-        description: A new Custom field to identify whether the line is Picked for Transport Desk Orders
-      isIntegratedCashLine:
-        type: string
-        format: 'maximum length: 1 (flag)'
-        example: "Y"
-        description: A new Custom field to identify whether the line is created from Integrated Cash Line Transport Desk
-      originalDSLineNo:
-        type: integer
-        format: 'nonNegativeInteger (total number of digits: 5)'
-        example: 1
-        description: original DS line no.
-      twChangeReasonCode:
-        type: string
-        format: 'maximum length: 150'
-        description: tw change reason code.
-      failedReasonCode:
-        type: string
-        format: 'maximum length: 150'
-        description: failed reason code.
-      failedReasonCodeTimeStamp:
-        type: string
-        format: dateTime
-        example: 2020-08-12T16:00:00.000Z
-        description: failed reason code time stamp.
-      splitGroupId:
-        type: string
-        format: 'maximum length: 40'
-        example: "1001"
-        description: Signifies if line is deviated to separate delivery.
-      paymentCutOffDateTime:
-        type: string
-        format: dateTime
-        example: 020-08-11T18:00:00.000Z
-        description: payment cutoff date time of delivery
-      tspSettlementReasonCode:
-        type: string
-        format: 'maximum length: 50'
-        example: FAILED_CUSTOMER, FAILED_IKEA, FAILED_TSP
-        description: tspSettlementReasonCode is optional field from L�mna at DS line extn for Customer Return during Re-booking scenario.  
-      additinalInfo:
-        type: string
-        format: 'maximum length: 40'
-        example: ID_CHECK_REQUIRED
-        description: any additional information pass to external systems
-      capabilityList:
-        $ref: '#/components/schemas/orderLine_extn_capabilityList'
-  orderLine_extn_capabilityList:
-    type: object
-    required:
-    - capability
-    properties:
-      capability:
-        type: array
-        items:
-          $ref: '#/components/schemas/capability'
-  capability:
-    type: object
-    required:
-    - capability
-    properties:
-      capability:
-        type: string
-        format: 'maximum length: 150'
-        example: WHEELCHAIR
-        description: capability
-  orderLine_additionalAddresses:
-    type: object
-    required:
-    - additionalAddress
-    properties:
-      additionalAddress:
-        type: array
-        items:
-          $ref: '#/components/schemas/additionalAddress'
-  additionalAddress:
-    type: object
-    required:
-    - addressType
-    - personInfo
-    properties:
-      addressType:
-        type: string
-        format: 'maximum length: 40'
-        description: Identifies the type of address
-      personInfo:
-        $ref: '#/components/schemas/additionalAddress_personInfo'
-  additionalAddress_personInfo:
-    type: object
-    required:
-    - addressLine1
-    - addressLine2
-    - addressLine3
-    - addressLine4
-    - city
-    - country
-    - extn
-    - lastName
-    - pupID
-    - state
-    - zipCode
-    properties:
-      addressLine1:
-        type: string
-        format: 'maximum length: 70'
-        example: addressLine1
-        description: The address line 1 field.
-      addressLine2:
-        type: string
-        format: 'maximum length: 70'
-        example: addressLine2
-        description: The address line 2 field.
-      addressLine3:
-        type: string
-        format: 'maximum length: 70'
-        example: addressLine3
-        description: The address line 3 field.
-      addressLine4:
-        type: string
-        format: 'maximum length: 70'
-        example: addressLine4
-        description: The address line 4 field.
-      pupID:
-        type: string
-        format: 'maximum length: 64'
-        example: pupID
-        description: PupID
-      city:
-        type: string
-        format: 'maximum length: 35'
-        example: city
-        description: The city in the address.
-      country:
-        type: string
-        format: 'maximum length: 40'
-        example: country
-        description: The country in the address.
-      state:
-        type: string
-        format: 'maximum length: 35'
-        example: state
-        description: state
-      zipCode:
-        type: string
-        format: 'maximum length: 35'
-        example: zip code
-        description: The post/zip code in the address.
-      lastName:
-        type: string
-        format: 'maximum length: 64'
-        example: lastName
-        description: PuP name
-      extn:
-        $ref: '#/components/schemas/personInfo_extn'
-  personInfo_extn:
-    type: object
-    required:
-    - openFriday
-    - openMonday
-    - openSaturday
-    - openSunday
-    - openThursday
-    - openTuesday
-    - openWednesday
-    properties:
-      openMonday:
-        type: string
-        format: 'maximum length: 300'
-        description: PuP opening times for Monday
-      openTuesday:
-        type: string
-        format: 'maximum length: 300'
-        description: PuP opening times for Tuesday
-      openWednesday:
-        type: string
-        format: 'maximum length: 300'
-        description: PuP opening times for Wednesday
-      openThursday:
-        type: string
-        format: 'maximum length: 300'
-        description: PuP opening times for Thursday
-      openFriday:
-        type: string
-        format: 'maximum length: 300'
-        description: PuP opening times for Friday
-      openSaturday:
-        type: string
-        format: 'maximum length: 300'
-        description: PuP opening times for Saturday
-      openSunday:
-        type: string
-        format: 'maximum length: 300'
-        description: PuP opening times for Sunday
-  order_orderLineRelationships:
-    type: object
-    required:
-    - orderLineRelationship
-    properties:
-      orderLineRelationship:
-        type: array
-        items:
-          $ref: '#/components/schemas/orderLineRelationship'
-  orderLineRelationship:
-    type: object
-    required:
-    - childLine
-    - operation
-    - parentLine
-    - relationshipType
-    properties:
-      operation:
-        type: string
-        format: 'maximum length: 40'
-        example: CREATE/DELETE
-      relationshipType:
-        type: string
-        format: 'maximum length: 40'
-        example: DELIVERY / SERVICE
-      parentLine:
-        $ref: '#/components/schemas/orderLineRelationship_parentLine'
-      childLine:
-        $ref: '#/components/schemas/orderLineRelationship_childLine'
-  order_paymentMethods:
-    type: object
-    required:
-    - paymentMethod
-    properties:
-      paymentMethod:
-        type: array
-        items:
-          $ref: '#/components/schemas/paymentMethod'
-  paymentMethod:
-    type: object
-    required:
-    - paymentReference1
-    - paymentTiming
-    - paymentType
-    properties:
-      paymentType:
-        type: string
-        format: 'maximum length: 20'
-        example: CASH/ OPEN_INVOICE/ PAYMENT_ON_DELIVERY/ INVOICE/ CASH_ON_COLLECTION
-        description: paymentType
-      paymentReference1:
-        type: string
-        format: 'maximum length: 100'
-        description: The payment reference 1
-      paymentTiming:
-        type: string
-        format: 'maximum length: 100'
-        description: payment timing
-  order_personInfoShipTo:
-    type: object
-    required:
-    - addressLine1
-    - addressLine2
-    - addressLine3
-    - addressLine4
-    - addressLine5
-    - addressLine6
-    - alternameEmailID
-    - city
-    - company
-    - country
-    - dayFaxNo
-    - dayPhone
-    - eMailID
-    - eveningPhone
-    - extn
-    - firstName
-    - lastName
-    - middleName
-    - mobilePhone
-    - otherPhone
-    - state
-    - zipCode
-    properties:
-      addressLine1:
-        type: string
-        format: 'maximum length: 70'
-        example: addressLine1
-        description: The address line 1 field.
-      addressLine2:
-        type: string
-        format: 'maximum length: 70'
-        example: addressLine2
-        description: The address line 2 field.
-      addressLine3:
-        type: string
-        format: 'maximum length: 70'
-        example: addressLine3
-        description: The address line 3 field.
-      addressLine4:
-        type: string
-        format: 'maximum length: 70'
-        example: addressLine4
-        description: The address line 4 field.
-      addressLine5:
-        type: string
-        format: 'maximum length: 70'
-        example: addressLine5
-        description: The address line 5 field.
-      addressLine6:
-        type: string
-        format: 'maximum length: 70'
-        example: addressLine6
-        description: The address line 6 field.
-      eMailID:
-        type: string
-        format: 'maximum length: 150'
-        example: ' abc.xyz@ingka.com'
-        description: email ID
-      city:
-        type: string
-        format: 'maximum length: 35'
-        example: Broadstairs
-        description: The city in the address.
-      country:
-        type: string
-        format: 'maximum length: 40'
-        example: GB
-        description: The country in the address.
-      company:
-        type: string
-        format: 'maximum length: 100'
-        example: company
-        description: CompanyBusiness name
-      firstName:
-        type: string
-        format: 'maximum length: 64'
-        example: First Name
-        description: The first name of the person.
-      lastName:
-        type: string
-        format: 'maximum length: 64'
-        example: lastName
-        description: The last name of the person.
-      middleName:
-        type: string
-        format: 'maximum length: 40'
-        example: middleName
-        description: The middle name of the person.
-      alternameEmailID:
-        type: string
-        format: 'maximum length: 150'
-        example: alternameEmailID
-        description: The alternate email address at which the person or a predesignated employee of the organization referred to in the address can be contacted.
-      dayPhone:
-        type: string
-        format: 'maximum length: 40'
-        example: +344544444
-        description: The day time phone at which the person or organization referred to in the address can be called.
-      dayFaxNo:
-        type: string
-        format: 'maximum length: 40'
-        example: ""
-        description: The day time fax at which the person or a predesignated employee of the organization referred to in the address can be notified
-      eveningPhone:
-        type: string
-        format: 'maximum length: 30'
-        example: +344544444
-        description: The evening time phone at which the person or organization referred to in the address can be called.
-      mobilePhone:
-        type: string
-        format: 'maximum length: 40'
-        example: +344544445
-        description: The mobile phone at which the person or a predesignated employee of the organization referred to in the address can be called.
-      otherPhone:
-        type: string
-        format: 'maximum length: 40'
-        example: +344544444
-        description: The alternate phone number at which the person or a predesignated employee of the organization referred to in the address can be called.
-      state:
-        type: string
-        format: 'maximum length: 35'
-        example: ""
-        description: 'The state in the address. '
-      zipCode:
-        type: string
-        format: 'maximum length: 35'
-        example: CT10 1DP
-        description: The post/zip code in the address.
-      extn:
-        $ref: '#/components/schemas/personInfoShipTo_extn'
-  personInfoShipTo_extn:
-    type: object
-    properties:
-      attention:
-        type: string
-        format: 'maximum length: 69'
-        description: attention
-      careOfName:
-        type: string
-        format: 'maximum length: 69'
-        description: careOfName
-      county:
-        type: string
-        format: 'maximum length: 69'
-        description: County
-      addressLine7:
-        type: string
-        format: 'maximum length: 69'
-        description: Address line 7
-      globalCustomerId:
-        type: string
-        format: 'maximum length: 100'
-        description: globalCustomerId
-      alternativeCollectorFirstname:
-        type: string
-        format: 'maximum length: 64'
-        description: AlternativeCollectorFirstname
-      alternativeCollectorSurname:
-        type: string
-        format: 'maximum length: 64'
-        description: ' AlternativeCollectorSurname '
-  order_personInfoBillTo:
-    type: object
-    required:
-    - addressLine1
-    - city
-    - country
-    - firstName
-    - lastName
-    - zipCode
-    properties:
-      eMailID:
-        type: string
-        format: 'maximum length: 150'
-        example: abc.xyz@ingka.com
-        description: Email id
-      addressLine1:
-        type: string
-        format: 'maximum length: 70'
-        example: addressLine1
-        description: The address line 1 field.
-      addressLine2:
-        type: string
-        format: 'maximum length: 70'
-        example: addressLine2
-        description: The address line 2 field.
-      addressLine3:
-        type: string
-        format: 'maximum length: 70'
-        example: addressLine3
-        description: The address line 3 field.
-      addressLine4:
-        type: string
-        format: 'maximum length: 70'
-        example: addressLine4
-        description: The address line 4 field.
-      addressLine5:
-        type: string
-        format: 'maximum length: 70'
-        example: addressLine5
-        description: The address line 5 field.
-      addressLine6:
-        type: string
-        format: 'maximum length: 70'
-        example: addressLine6
-        description: The address line 6 field.
-      city:
-        type: string
-        format: 'maximum length: 35'
-        example: Broadstairs
-        description: The city in the address.
-      country:
-        type: string
-        format: 'maximum length: 40'
-        example: GB/SE/IE
-        description: The country in the address.
-      company:
-        type: string
-        format: 'maximum length: 100'
-        example: Company Business name
-        description: CompanyBusiness name
-      firstName:
-        type: string
-        format: 'maximum length: 64'
-        example: firstName
-        description: The first name of the person.
-      lastName:
-        type: string
-        format: 'maximum length: 64'
-        example: lastName
-        description: lastName
-      middleName:
-        type: string
-        format: 'maximum length: 40'
-        example: middleName
-        description: The middle name of the person.
-      alternameEmailID:
-        type: string
-        format: 'maximum length: 150'
-        example: alternameEmailID@gmail.com
-        description: The alternate email address at which the person or a predesignated employee of the organization referred to in the address can be contacted.
-      dayPhone:
-        type: string
-        format: 'maximum length: 40'
-        example: +344544444
-        description: The day time phone at which the person or organization referred to in the address can be called.
-      dayFaxNo:
-        type: string
-        format: 'maximum length: 40'
-        example: day Fax
-        description: The day time fax at which the person or a predesignated employee of the organization referred to in the address can be notified
-      eveningPhone:
-        type: string
-        format: 'maximum length: 40'
-        example: +344544444
-        description: The evening time phone at which the person or organization referred to in the address can be called.
-      mobilePhone:
-        type: string
-        format: 'maximum length: 40'
-        example: +344544555
-        description: The mobile phone at which the person or a predesignated employee of the organization referred to in the address can be called.
-      otherPhone:
-        type: string
-        format: 'maximum length: 40'
-        example: +344544444
-        description: The alternate phone number at which the person or a predesignated employee of the organization referred to in the address can be called.
-      state:
-        type: string
-        format: 'maximum length: 35'
-        example: State
-        description: The state in the address.
-      zipCode:
-        type: string
-        format: 'maximum length: 35'
-        example: CT10 1DP
-        description: The post/zip code in the address.
-      extn:
-        $ref: '#/components/schemas/personInfoBillTo_extn'
-  personInfoBillTo_extn:
-    type: object
-    properties:
-      attention:
-        type: string
-        format: 'maximum length: 69'
-        description: attention
-      careOfName:
-        type: string
-        format: 'maximum length: 69'
-        description: careOfName
-      county:
-        type: string
-        format: 'maximum length: 69'
-        description: County
-      addressLine7:
-        type: string
-        format: 'maximum length: 69'
-        description: Address line 7
-      globalCustomerId:
-        type: string
-        format: 'maximum length: 100'
-        example: F8D58017-4762-11ea-9C68-005056B1779F
-        description: globalCustomerId
-  order_headerCharges:
-    type: object
-    required:
-    - headerCharge
-    properties:
-      headerCharge:
-        type: array
-        items:
-          $ref: '#/components/schemas/headerCharge'
-  headerCharge:
-    type: object
-    required:
-    - chargeAmount
-    - chargeCategory
-    - chargeName
-    properties:
-      chargeAmount:
-        type: integer
-        format: 'decimal (total number of digits: 15 fraction digits: 2) '
-        example: "20.50"
-        description: The amount of the charge.
-      chargeCategory:
-        type: string
-        format: 'maximum length: 20'
-        example: Discount
-        description: The charge category. For example, Labeling or Handling.
-      chargeName:
-        type: string
-        format: 'maximum length: 20'
-        description: The charge name.
-  order_priceInfo:
-    type: object
-    required:
-    - currency
-    properties:
-      currency:
-        type: string
-        format: 'maximum length: 20'
-        example: CZK / GBP / SEK
-        description: The currency code in which this order is being processed. All price fields are assumed to be in this currency.
-  order_headerTaxes:
-    type: object
-    required:
-    - headerTax
-    properties:
-      headerTax:
-        type: array
-        items:
-          $ref: '#/components/schemas/headerTax'
-  headerTax:
-    type: object
-    required:
-    - tax
-    - taxName
-    properties:
-      taxName:
-        type: string
-        format: 'maximum length: 40'
-        example: VAT
-        description: Type of tax. The TaxName must only be passed once, even when using a combination of ChargeCategory and ChargeName.
-      tax:
-        type: integer
-        format: 'decimal(total number of digits: 15 fraction digits: 2) '
-        example: "2.50"
-        description: This is to capture Header level tax if any. Line level tax should not be added or sent in this attribute. If there is no Header tax, it can be sent as Zero or do not sent the element
-  order_fileAttachments:
-    type: object
-    properties:
-      fileAttachment:
-        type: array
-        items:
-          $ref: '#/components/schemas/fileAttachment'
-  fileAttachment:
-    type: object
-    properties:
-      fileContentType:
-        type: string
-        format: 'maximum length: 100'
-        example: VAT_REFUND / SERVICE_REPORT/ PNG/ PICTURE/ PDF/ OTHER/ MEASUREMENT/ JPG/ IHP Drawing/ DRAWING/ USTOMER_COMMUNICATION/ ASSEMBLY_INSTRUCTION
-        description: Type of the file content as returned by FileUploadServlet
-      fileDescription:
-        type: string
-        format: 'maximum length: 255'
-        description: Description of the file as returned by FileUploadServlet
-      fileName:
-        type: string
-        format: 'maximum length: 100'
-        description: Complete name of the file as returned by FileUploadServlet
-      operation:
-        type: string
-        format: 'maximum length: 100'
-        example: DELETE
-        description: Operation.
-      extn:
-        $ref: '#/components/schemas/fileAttachment_extn'
-  fileAttachment_extn:
-    type: object
-    properties:
-      locationURL:
-        type: string
-        format: 'maximum length: 300'
-        description: The URL relating to Location
-      systemSourceName:
-        type: string
-        format: 'maximum length: 20'
-        example: PAX
-        description: The source of the system for a specific file attachment.
-      servicePrimeLineNo:
-        type: integer
-        format: 'nonNegativeInteger (total number of digits: 5)'
-        example: 1
-        description: Field to store the associated service item's PrimeLineNo.
-  order_answerSets:
-    type: object
-    required:
-    - answerSet
-    properties:
-      answerSet:
-        type: array
-        items:
-          $ref: '#/components/schemas/answerSet'
-  answerSet:
-    type: object
-    required:
-    - answers
-    - questionType
-    properties:
-      questionType:
-        type: string
-        format: 'maximum length: 20'
-        description: The question type associated to the defined answer set
-      answers:
-        $ref: '#/components/schemas/answerSet_answers'
-  answerSet_answers_answer:
-    type: object
-    required:
-    - answerValue
-    - extn
-    properties:
-      answerValue:
-        type: string
-        format: 'maximum length: 1000'
-        description: AnswerValue passed should be a valid answer for the question it belongs to
-      questionID:
-        type: string
-        format: 'maximum length: 20'
-        description: Identifier for the question that this answer is for.
-      extn:
-        $ref: '#/components/schemas/answerSet_answers_answer_extn'
-  order_resolutionDetailsList:
-    type: object
-    properties:
-      resolutionDetails:
-        type: array
-        items:
-          $ref: '#/components/schemas/resolutionDetails'
-  resolutionDetails:
-    type: object
-    properties:
-      inbox:
-        $ref: '#/components/schemas/resolutionDetails_inbox'
-  order_shipments:
-    type: object
-    properties:
-      shipment:
-        type: array
-        items:
-          $ref: '#/components/schemas/shipment'
-  shipment:
-    type: object
-    properties:
-      extn:
-        $ref: '#/components/schemas/shipment_extn'
-  modifyOrderResponse:
-    type: object
-    properties:
-      responseMessage:
-        type: string
-        example: SuccessfullyProcessed.
-        description: it will givive you the response message like SuccessfullyProcessed/InvalidRequest.
-      responseCode:
-        type: string
-        example: "200"
-        description: it will givive you the response code 200 or 400
-  modifyOrderErrorResponse:
-    type: object
-    properties:
-      responseMessage:
-        type: string
-        example: InvalidRequest
-        description: It will show the success or failure message
-      responseCode:
-        type: string
-        example: "400"
-        description: It will give you the  code as 200 for success and 400 for the invalid request
-      error:
-        $ref: '#/components/schemas/modifyOrderErrorResponse_error'
-  modifyOrderRequest_order:
-    type: object
-    required:
-    - action
-    - answerSets
-    - countryCode
-    - customerContactID
-    - customerEMailID
-    - extn
-    - fileAttachments
-    - headerCharges
-    - headerTaxes
-    - orderLineRelationships
-    - orderLines
-    - orderNo
-    - paymentMethods
-    - personInfoBillTo
-    - personInfoShipTo
-    - priceInfo
-    - resolutionDetailsList
-    - shipments
-    properties:
-      countryCode:
-        type: string
-        format: maximum length:5
-        example: GB
-        description: Country Code to identify to which country the order belongs to.
-      customerContactID:
-        type: string
-        format: 'maximum length: 40'
-        example: customerContactID
-        description: This is the customer contact ID of the order.
-      customerEMailID:
-        type: string
-        format: 'maximum length: 150'
-        example: saumya.dash@ingka.com
-        description: The E-mail ID of the customer.
-      orderNo:
-        type: string
-        format: 'maximum length: 40'
-        example: "1091799904"
-        description: Number of the isom order
-      action:
-        type: string
-        format: 'maximum length: 40'
-        example: MODIFY/CANCEL
-        description: Type of action performed on the order.
-      extn:
-        $ref: '#/components/schemas/order_extn'
-      orderLines:
-        $ref: '#/components/schemas/order_orderLines'
-      orderLineRelationships:
-        $ref: '#/components/schemas/order_orderLineRelationships'
-      paymentMethods:
-        $ref: '#/components/schemas/order_paymentMethods'
-      personInfoShipTo:
-        $ref: '#/components/schemas/order_personInfoShipTo'
-      personInfoBillTo:
-        $ref: '#/components/schemas/order_personInfoBillTo'
-      headerCharges:
-        $ref: '#/components/schemas/order_headerCharges'
-      priceInfo:
-        $ref: '#/components/schemas/order_priceInfo'
-      headerTaxes:
-        $ref: '#/components/schemas/order_headerTaxes'
-      fileAttachments:
-        $ref: '#/components/schemas/order_fileAttachments'
-      answerSets:
-        $ref: '#/components/schemas/order_answerSets'
-      resolutionDetailsList:
-        $ref: '#/components/schemas/order_resolutionDetailsList'
-      shipments:
-        $ref: '#/components/schemas/order_shipments'
-  orderLine_item:
-    type: object
-    required:
-    - itemDesc
-    - itemID
-    - unitOfMeasure
-    properties:
-      itemID:
-        type: string
-        format: 'maximum length: 40'
-        example: ART20350182, SGR40400001
-        description: The identifier for the item.
-      unitOfMeasure:
-        type: string
-        format: 'maximum length: 40'
-        example: Meter/ Piece/ ORDERS/ PAT_VALUE
-        description: the unitOfMeasure applicable for the Item
-      itemDesc:
-        type: string
-        format: 'maximum length: 40'
-        description: The description of the item.
-  orderLine_linePriceInfo:
-    type: object
-    required:
-    - retailPrice
-    - unitPrice
-    properties:
-      retailPrice:
-        type: integer
-        format: 'decimal (minimum value: 0 total number of digits: 19 fraction digits: 6)'
-        description: The unit price for the order line - TAX inclusive.
-      unitPrice:
-        type: integer
-        format: 'decimal (minimum value: 0 total number of digits: 15 fraction digits: 2)'
-        description: The unit price for the order line - TAX exclusive.
-  orderLine_references:
-    type: object
-    required:
-    - mergeDeliveryNo
-    - mergeOrderNo
-    properties:
-      mergeOrderNo:
-        type: string
-        format: 'maximum length: 40'
-        example: "1091424950"
-        description: This is order number of the regular sales order to which transport desk order in getting merged This is an optional field and will be passed only in 1.3.1 order merge.
-      mergeDeliveryNo:
-        type: string
-        format: 'maximum length: 254'
-        example: "1"
-        description: Prime line number of the delivery(DS line) which is getting merged with Transport desk delivery This is an optional field and will be passed only in 1.3.1 order merge
-  orderLineRelationship_parentLine:
-    type: object
-    required:
-    - primeLineNo
-    properties:
-      primeLineNo:
-        type: integer
-        format: 'nonNegativeInteger (total number of digits: 5)'
-        example: 1
-  orderLineRelationship_childLine:
-    type: object
-    required:
-    - primeLineNo
-    properties:
-      primeLineNo:
-        type: integer
-        format: 'nonNegativeInteger (total number of digits: 5)'
-        example: 3
-  answerSet_answers:
-    type: object
-    required:
-    - answer
-    properties:
-      answer:
-        type: array
-        items:
-          $ref: '#/components/schemas/answerSet_answers_answer'
-  answerSet_answers_answer_extn:
-    type: object
-    required:
-    - questionRef
-    - servicePrimeLineNo
-    properties:
-      questionRef:
-        type: string
-        format: 'maximum length: 40'
-        description: The attribute will use to hold question reference
-      option:
-        type: string
-        format: 'maximum length: 40'
-        description: Option
-      servicePrimeLineNo:
-        type: integer
-        format: 'nonNegativeInteger (total number of digits: 5)'
-        description: Associated service Prime Line No of the this answerset
-  resolutionDetails_inbox:
-    type: object
-    required:
-    - inboxKey
-    properties:
-      inboxKey:
-        type: string
-        format: 'maximum length: 24'
-        description: Primary key of the deviation.
-  shipment_extn:
-    type: object
-    properties:
-      workOrderNo:
-        type: string
-        format: 'maximum length: 40'
-        example: "4201022"
-        description: Number of the work order associated to the order.
-      cduID:
-        type: string
-        format: 'maximum length: 50'
-        example: "3565656"
-        description: CDU ID.
-      action:
-        type: string
-        format: 'maximum length: 50'
-        example: CANCEL
-        description: action on shipment
-  modifyOrderErrorResponse_error:
-    type: object
-    properties:
-      errorUniqueExceptionId:
-        type: string
-        example: 172.19.203.3815707054935370000000000001
-        description: Unique error exception Id which will contain IP address ,timestamp details
-      errorDescription:
-        type: string
-        example: Please send valid Service type
-        description: error description of an exception
-      errorCode:
-        type: string
-        example: EXTN_SOMCO_0011
-        description: error code of an exception
-    description: represents exception to successful response of crete order rest api
+components:
+  schemas:
+    modifyOrderRequest:
+      type: object
+      properties:
+        order:
+          $ref: '#/components/schemas/modifyOrderRequest_order'
+    order_extn:
+      type: object
+      required:
+      - deliveryArrangementsId
+      - isBusinessCustomer
+      - languageDemand
+      - officialLanguage
+      - orderNoSrc
+      - preferredCommunicationMethod
+      - preferredLanguage
+      - serviceProviderPreferredLocale
+      - serviceType
+      - totalAmount
+      - tspSettlementReasonCode
+      properties:
+        officialLanguage:
+          type: string
+          format: 'maximum length: 40'
+          example: en
+          description: officialLanguage
+        preferredLanguage:
+          type: string
+          format: 'maximum length: 40'
+          example: en
+          description: preferredLanguage
+        orderNoSrc:
+          type: string
+          format: 'maximum length: 40'
+          example: A01
+          description: Order number source.
+        serviceType:
+          type: string
+          format: 'maximum length: 24'
+          example: HOME_DELIVERY , PUOP, PUP, CLICK_COLLECT, LOCKER, CLICK_COLLECT_STORE
+          description: OrderService type for the request.
+        isBusinessCustomer:
+          type: string
+          format: 'maximum length: 1'
+          example: Y or N
+          description: is business customer
+        preferredCommunicationMethod:
+          type: string
+          format: 'maximum length: 40'
+          example: FAX/ EMAIL/ PHONE/ SMS/ ADDRESS
+          description: Customer's preferred communication method
+        serviceProviderPreferredLocale:
+          type: string
+          format: 'maximum length: 40'
+          example: en-US , sv-SE
+          description: Preferred locale of the customer
+        languageDemand:
+          type: string
+          format: 'maximum length: 20'
+          example: true/false
+          description: A true or false indicator on whether the customer has demanded a certain language to be used.
+        totalAmount:
+          type: integer
+          format: ExternalAmount
+          example: "20.0"
+          description: Total Amount Excluding Discounts
+        deliveryArrangementsId:
+          type: string
+          format: 'maximum length: 40'
+          example: "20200908141240087100777"
+          description: Delivery Arrangement Id used while placing the order.
+        tspSettlementReasonCode:
+          type: string
+          format: 'maximum length: 50'
+          example: FAILED_CUSTOMER, FAILED_IKEA, FAILED_TSP
+          description: tspSettlementReasonCode is optional field from L�mna for Cutomer Return during full cancellation.
+    order_orderLines:
+      type: object
+      required:
+      - orderLine
+      properties:
+        orderLine:
+          type: array
+          items:
+            $ref: '#/components/schemas/orderLine'
+    orderLine:
+      type: object
+      required:
+      - action
+      - additionalAddresses
+      - extn
+      - item
+      - itemGroupCode
+      - levelOfService
+      - linePriceInfo
+      - lineTaxes
+      - mergeNode
+      - orderHoldTypes
+      - orderedQty
+      - primeLineNo
+      - promisedApptEndDate
+      - promisedApptStartDate
+      - references
+      - reqDeliveryDate
+      - shipNode
+      - status
+      - workOrderAppointments
+      properties:
+        action:
+          type: string
+          format: 'maximum length: 40'
+          example: CANCEL/CREATE/MODIFY
+          description: Type of modification performed on the orderline
+        itemGroupCode:
+          type: string
+          format: 'maximum length: 20'
+          example: PROD/DS/PS
+          description: Specifies whether the article is a product, delivery, or provided service type.
+        levelOfService:
+          type: string
+          format: 'maximum length: 40'
+          example: SGR90000897
+          description: 'Indicates the level of service required for this order line. Note: This should not be populated at DS/PS line level'
+        orderedQty:
+          type: integer
+          format: 'decimal (minimum value: 0 total number of digits: 9 fraction digits: 2) '
+          example: 10
+          description: The quantity of the line item that is being ordered.
+        primeLineNo:
+          type: integer
+          format: 'nonNegativeInteger (total number of digits: 5) '
+          example: 2
+          description: The order line number. Part of an OrderLine's unique key.
+        reqDeliveryDate:
+          type: string
+          format: dateTime
+          example: 020-08-11T18:00:00.000Z
+          description: if iSell is not sending this value is same as PromisedApptStartDate at line level
+        shipNode:
+          type: string
+          format: 'maximum length: 24'
+          example: CDC.030
+          description: Ship node from which the order line will be fulfilled.
+        mergeNode:
+          type: string
+          format: 'maximum length: 24'
+          example: LSC.258
+          description: This is the node where these lines are merged before final delivery
+        promisedApptStartDate:
+          type: string
+          format: dateTime
+          example: 2020-08-12T16:00:00.000Z
+          description: The date and time when the appointment starts for an OrderLine.This date only applies to both Delivery (ItemGroupCode=DS) and Provided (ItemGroupCode=PS) lines for ISOM.
+        promisedApptEndDate:
+          type: string
+          format: dateTime
+          example: 2020-08-12T07:00:00.000Z
+          description: The date and time when the appointment ends for an OrderLine. This date only applies to Delivery  (ItemGroupCode=DS) and Provided (ItemGroupCode=PS) lines for ISOM.
+        timezone:
+          type: string
+          format: 'maximum length: 40'
+          example: Europe/London
+          description: The timezone in which the promised appointment has been recorded. This attribute only applies to  Provided (ItemGroupCode=PS) and  (ItemGroupCode=DS) lines.
+        tmallReservationId:
+          type: string
+          format: 'maximum length: 40'
+          example: 'TMALL202204271848'
+          description: This attribute only applies to (ItemGroupCode=PROD) lines and Tmall reservation id.        
+        status:
+          type: string
+          format: 'maximum length: 40'
+          example: 3700.01.100
+          description: Maximum order line status among all records that belong to an order.
+        item:
+          $ref: '#/components/schemas/orderLine_item'
+        linePriceInfo:
+          $ref: '#/components/schemas/orderLine_linePriceInfo'
+        references:
+          $ref: '#/components/schemas/orderLine_references'
+        lineTaxes:
+          $ref: '#/components/schemas/orderLine_lineTaxes'
+        orderHoldTypes:
+          $ref: '#/components/schemas/orderLine_orderHoldTypes'
+        workOrderAppointments:
+          $ref: '#/components/schemas/orderLine_workOrderAppointments'
+        extn:
+          $ref: '#/components/schemas/orderLine_extn'
+        additionalAddresses:
+          $ref: '#/components/schemas/orderLine_additionalAddresses'
+      description: Contains orderline information.
+    orderLine_lineTaxes:
+      type: object
+      required:
+      - lineTax
+      properties:
+        lineTax:
+          type: array
+          items:
+            $ref: '#/components/schemas/lineTax'
+    lineTax:
+      type: object
+      required:
+      - tax
+      - taxName
+      - taxPercentage
+      properties:
+        taxName:
+          type: string
+          format: 'maximum length: 40'
+          example: VAT
+          description: Type of tax.
+        taxPercentage:
+          type: integer
+          format: 'decimal (minimum value: 0 total number of digits: 8 fraction digits: 5'
+          example: "2.50"
+          description: Percentage amount for tax calculation.
+        tax:
+          type: integer
+          format: 'decimal (total number of digits: 15 fraction digits: 2)'
+          example: "12.50"
+          description: 'The tax amount.� '
+    orderLine_orderHoldTypes:
+      type: object
+      required:
+      - orderHoldType
+      properties:
+        orderHoldType:
+          type: array
+          items:
+            $ref: '#/components/schemas/orderHoldType'
+    orderHoldType:
+      type: object
+      required:
+      - holdType
+      - status
+      properties:
+        holdType:
+          type: string
+          format: ' maxlength - 20'
+          example: ReadyToAssignHold/ ExceptionVolumeHold/ ExceptionQtyHold
+          description: Hold type to be applied
+        status:
+          type: string
+          format: ' maxlength - 15'
+          example: 1100 / 1300
+          description: Status of the order hold type
+    orderLine_workOrderAppointments:
+      type: object
+      required:
+      - workOrderAppointment
+      properties:
+        workOrderAppointment:
+          type: array
+          items:
+            $ref: '#/components/schemas/workOrderAppointment'
+    workOrderAppointment:
+      type: object
+      required:
+      - capacityAllocated
+      - promisedApptEndDate
+      - promisedApptStartDate
+      - timeWindowID
+      - timeZone
+      properties:
+        timeWindowID:
+          type: string
+          description: TimeWindowID sent by sterling during timewindow call will be sent back. This only for PS line.
+        capacityAllocated:
+          type: integer
+          format: 'decimal (total number of digits: 5 fraction digits: 2)'
+          description: A new custom field to store and send the capacity units to centiro. The value is sent down from Isell to ISOM. There is no business logic involved in Isom on this field. This only for PS line.
+        promisedApptStartDate:
+          type: string
+          format: dateTime
+          example: 2020-08-12T16:00:00.000Z
+          description: The date and time when the appointment starts for an OrderLine.This date only applies to both Delivery (ItemGroupCode=DS) and Provided (ItemGroupCode=PS) lines for ISOM. Note:this is required attribute for DS,PS line time
+        promisedApptEndDate:
+          type: string
+          format: dateTime
+          example: 2020-08-12T07:00:00.000Z
+          description: The date and time when the appointment ends for an OrderLine. This date only applies to Delivery  (ItemGroupCode=DS) and Provided (ItemGroupCode=PS) lines for ISOM. Note:this is required attribute for DS,PS line time
+        timeZone:
+          type: string
+          format: 'maximum length: 40'
+          example: Europe/London
+          description: The timeZone in which the promised appointment has been recorded. This attribute only applies to  Provided (ItemGroupCode=PS) and  (ItemGroupCode=DS) lines.
+    orderLine_extn:
+      type: object
+      required:
+      - capabilityList
+      - custProjId
+      - custProjManuUrl
+      - custProjSrc
+      - failedReasonCode
+      - failedReasonCodeTimeStamp
+      - handInLocation
+      - handInUser
+      - hasCustomWorktopDrawing
+      - hasExceptionQty
+      - identifier
+      - isIntegratedCashLine
+      - isPicked
+      - originalDSLineNo
+      - payTo
+      - paymentCutOffDateTime
+      - resourcePoolId
+      - serviceProviderId
+      - splitGroupId
+      - timeWindowID
+      - totalDeliveryPrice
+      - twChangeReasonCode
+      - tspSettlementReasonCode
+      - additinalInfo
+      properties:
+        hasExceptionQty:
+          type: string
+          format: 'maximum length: 1'
+          example: "Y"
+          description: Exception quantity flag
+        resourcePoolId:
+          type: string
+          example: hW8K596rS0+XYg6SANsGfQ==
+          description: Resource pool ID for serviceline
+        hasCustomWorktopDrawing:
+          type: string
+          format: 'maximum length: 1'
+          example: "Y"
+          description: Flag indicating if item has an associated worktop drawing
+        timeWindowID:
+          type: string
+          format: 'maximum length: 36'
+          example: 5d3ffed7-212f-4851-8d44-0e9300528951
+          description: TimeWindowID required by Centiro to identify slot during dispatch date calculation
+        totalDeliveryPrice:
+          type: integer
+          format: 'decimal (minimum value: 0 total number of digits: 19 fraction digits: 6)'
+          example: "25.50"
+          description: Total price of items and delivery part of this delivery service. Applied only for services
+        identifier:
+          type: string
+          format: Identifier
+          description: Identifier for Network id for PuP service provider
+        custProjId:
+          type: string
+          format: 'maximum length: 50'
+          example: MyIkeaProject01
+          description: 'Identifier for the customer project Note: If this data is not present, no need to send them.'
+        custProjSrc:
+          type: string
+          format: 'maximum length: 25'
+          example: IHP3, CWT
+          description: 'Field indicating the source system for the project''s associated worktop drawing Note: If this data is not present, no need to send them.'
+        custProjManuUrl:
+          type: string
+          format: 'maximum length: 255'
+          example: manuinfo.ihp3.ikea.com/?ru=SE?Project=���
+          description: 'An URL pointing to where supplier can find the actual manufactoring information Note: If this data is not present, no need to send them.'
+        payTo:
+          type: string
+          format: 'maximum length: 20'
+          example: PAY_TO_IKEA/PAY_TO_SP
+          description: A new custom field to identify to whom the payment has to be made for the service provided. Valid values are PAY_TO_KEA and PAY_TO_SP. If this data is not present, no need to send them.
+        serviceProviderId:
+          type: string
+          format: 'maximum length: 80'
+          example: pd18a30c-ecfb-4272-9f1c-0b6900b550
+          description: 'A new custom field to store and send the service provider reference to centiro. The value is sent down from Isell to ISOM. '
+        handInLocation:
+          type: string
+          format: 'maximum length: 250'
+          description: A new custom field to identify the  HandInLocation for Transport Desk Orders
+        handInUser:
+          type: string
+          format: 'maximum length: 150'
+          description: A new custom field to identify the  HandInUser for Transport Desk Orders
+        isPicked:
+          type: string
+          format: 'maximum length: 1 (flag)'
+          example: "Y"
+          description: A new Custom field to identify whether the line is Picked for Transport Desk Orders
+        isIntegratedCashLine:
+          type: string
+          format: 'maximum length: 1 (flag)'
+          example: "Y"
+          description: A new Custom field to identify whether the line is created from Integrated Cash Line Transport Desk
+        originalDSLineNo:
+          type: integer
+          format: 'nonNegativeInteger (total number of digits: 5)'
+          example: 1
+          description: original DS line no.
+        twChangeReasonCode:
+          type: string
+          format: 'maximum length: 150'
+          description: tw change reason code.
+        failedReasonCode:
+          type: string
+          format: 'maximum length: 150'
+          description: failed reason code.
+        failedReasonCodeTimeStamp:
+          type: string
+          format: dateTime
+          example: 2020-08-12T16:00:00.000Z
+          description: failed reason code time stamp.
+        splitGroupId:
+          type: string
+          format: 'maximum length: 40'
+          example: "1001"
+          description: Signifies if line is deviated to separate delivery.
+        paymentCutOffDateTime:
+          type: string
+          format: dateTime
+          example: 020-08-11T18:00:00.000Z
+          description: payment cutoff date time of delivery
+        tspSettlementReasonCode:
+          type: string
+          format: 'maximum length: 50'
+          example: FAILED_CUSTOMER, FAILED_IKEA, FAILED_TSP
+          description: tspSettlementReasonCode is optional field from L�mna at DS line extn for Customer Return during Re-booking scenario.  
+        additinalInfo:
+          type: string
+          format: 'maximum length: 40'
+          example: ID_CHECK_REQUIRED
+          description: any additional information pass to external systems
+        capabilityList:
+          $ref: '#/components/schemas/orderLine_extn_capabilityList'
+    orderLine_extn_capabilityList:
+      type: object
+      required:
+      - capability
+      properties:
+        capability:
+          type: array
+          items:
+            $ref: '#/components/schemas/capability'
+    capability:
+      type: object
+      required:
+      - capability
+      properties:
+        capability:
+          type: string
+          format: 'maximum length: 150'
+          example: WHEELCHAIR
+          description: capability
+    orderLine_additionalAddresses:
+      type: object
+      required:
+      - additionalAddress
+      properties:
+        additionalAddress:
+          type: array
+          items:
+            $ref: '#/components/schemas/additionalAddress'
+    additionalAddress:
+      type: object
+      required:
+      - addressType
+      - personInfo
+      properties:
+        addressType:
+          type: string
+          format: 'maximum length: 40'
+          description: Identifies the type of address
+        personInfo:
+          $ref: '#/components/schemas/additionalAddress_personInfo'
+    additionalAddress_personInfo:
+      type: object
+      required:
+      - addressLine1
+      - addressLine2
+      - addressLine3
+      - addressLine4
+      - city
+      - country
+      - extn
+      - lastName
+      - pupID
+      - state
+      - zipCode
+      properties:
+        addressLine1:
+          type: string
+          format: 'maximum length: 70'
+          example: addressLine1
+          description: The address line 1 field.
+        addressLine2:
+          type: string
+          format: 'maximum length: 70'
+          example: addressLine2
+          description: The address line 2 field.
+        addressLine3:
+          type: string
+          format: 'maximum length: 70'
+          example: addressLine3
+          description: The address line 3 field.
+        addressLine4:
+          type: string
+          format: 'maximum length: 70'
+          example: addressLine4
+          description: The address line 4 field.
+        pupID:
+          type: string
+          format: 'maximum length: 64'
+          example: pupID
+          description: PupID
+        city:
+          type: string
+          format: 'maximum length: 35'
+          example: city
+          description: The city in the address.
+        country:
+          type: string
+          format: 'maximum length: 40'
+          example: country
+          description: The country in the address.
+        state:
+          type: string
+          format: 'maximum length: 35'
+          example: state
+          description: state
+        zipCode:
+          type: string
+          format: 'maximum length: 35'
+          example: zip code
+          description: The post/zip code in the address.
+        lastName:
+          type: string
+          format: 'maximum length: 64'
+          example: lastName
+          description: PuP name
+        extn:
+          $ref: '#/components/schemas/personInfo_extn'
+    personInfo_extn:
+      type: object
+      required:
+      - openFriday
+      - openMonday
+      - openSaturday
+      - openSunday
+      - openThursday
+      - openTuesday
+      - openWednesday
+      properties:
+        openMonday:
+          type: string
+          format: 'maximum length: 300'
+          description: PuP opening times for Monday
+        openTuesday:
+          type: string
+          format: 'maximum length: 300'
+          description: PuP opening times for Tuesday
+        openWednesday:
+          type: string
+          format: 'maximum length: 300'
+          description: PuP opening times for Wednesday
+        openThursday:
+          type: string
+          format: 'maximum length: 300'
+          description: PuP opening times for Thursday
+        openFriday:
+          type: string
+          format: 'maximum length: 300'
+          description: PuP opening times for Friday
+        openSaturday:
+          type: string
+          format: 'maximum length: 300'
+          description: PuP opening times for Saturday
+        openSunday:
+          type: string
+          format: 'maximum length: 300'
+          description: PuP opening times for Sunday
+    order_orderLineRelationships:
+      type: object
+      required:
+      - orderLineRelationship
+      properties:
+        orderLineRelationship:
+          type: array
+          items:
+            $ref: '#/components/schemas/orderLineRelationship'
+    orderLineRelationship:
+      type: object
+      required:
+      - childLine
+      - operation
+      - parentLine
+      - relationshipType
+      properties:
+        operation:
+          type: string
+          format: 'maximum length: 40'
+          example: CREATE/DELETE
+        relationshipType:
+          type: string
+          format: 'maximum length: 40'
+          example: DELIVERY / SERVICE
+        parentLine:
+          $ref: '#/components/schemas/orderLineRelationship_parentLine'
+        childLine:
+          $ref: '#/components/schemas/orderLineRelationship_childLine'
+    order_paymentMethods:
+      type: object
+      required:
+      - paymentMethod
+      properties:
+        paymentMethod:
+          type: array
+          items:
+            $ref: '#/components/schemas/paymentMethod'
+    paymentMethod:
+      type: object
+      required:
+      - paymentReference1
+      - paymentTiming
+      - paymentType
+      properties:
+        paymentType:
+          type: string
+          format: 'maximum length: 20'
+          example: CASH/ OPEN_INVOICE/ PAYMENT_ON_DELIVERY/ INVOICE/ CASH_ON_COLLECTION
+          description: paymentType
+        paymentReference1:
+          type: string
+          format: 'maximum length: 100'
+          description: The payment reference 1
+        paymentTiming:
+          type: string
+          format: 'maximum length: 100'
+          description: payment timing
+    order_personInfoShipTo:
+      type: object
+      required:
+      - addressLine1
+      - addressLine2
+      - addressLine3
+      - addressLine4
+      - addressLine5
+      - addressLine6
+      - alternameEmailID
+      - city
+      - company
+      - country
+      - dayFaxNo
+      - dayPhone
+      - eMailID
+      - eveningPhone
+      - extn
+      - firstName
+      - lastName
+      - middleName
+      - mobilePhone
+      - otherPhone
+      - state
+      - zipCode
+      properties:
+        addressLine1:
+          type: string
+          format: 'maximum length: 70'
+          example: addressLine1
+          description: The address line 1 field.
+        addressLine2:
+          type: string
+          format: 'maximum length: 70'
+          example: addressLine2
+          description: The address line 2 field.
+        addressLine3:
+          type: string
+          format: 'maximum length: 70'
+          example: addressLine3
+          description: The address line 3 field.
+        addressLine4:
+          type: string
+          format: 'maximum length: 70'
+          example: addressLine4
+          description: The address line 4 field.
+        addressLine5:
+          type: string
+          format: 'maximum length: 70'
+          example: addressLine5
+          description: The address line 5 field.
+        addressLine6:
+          type: string
+          format: 'maximum length: 70'
+          example: addressLine6
+          description: The address line 6 field.
+        eMailID:
+          type: string
+          format: 'maximum length: 150'
+          example: ' abc.xyz@ingka.com'
+          description: email ID
+        city:
+          type: string
+          format: 'maximum length: 35'
+          example: Broadstairs
+          description: The city in the address.
+        country:
+          type: string
+          format: 'maximum length: 40'
+          example: GB
+          description: The country in the address.
+        company:
+          type: string
+          format: 'maximum length: 100'
+          example: company
+          description: CompanyBusiness name
+        firstName:
+          type: string
+          format: 'maximum length: 64'
+          example: First Name
+          description: The first name of the person.
+        lastName:
+          type: string
+          format: 'maximum length: 64'
+          example: lastName
+          description: The last name of the person.
+        middleName:
+          type: string
+          format: 'maximum length: 40'
+          example: middleName
+          description: The middle name of the person.
+        alternameEmailID:
+          type: string
+          format: 'maximum length: 150'
+          example: alternameEmailID
+          description: The alternate email address at which the person or a predesignated employee of the organization referred to in the address can be contacted.
+        dayPhone:
+          type: string
+          format: 'maximum length: 40'
+          example: +344544444
+          description: The day time phone at which the person or organization referred to in the address can be called.
+        dayFaxNo:
+          type: string
+          format: 'maximum length: 40'
+          example: ""
+          description: The day time fax at which the person or a predesignated employee of the organization referred to in the address can be notified
+        eveningPhone:
+          type: string
+          format: 'maximum length: 30'
+          example: +344544444
+          description: The evening time phone at which the person or organization referred to in the address can be called.
+        mobilePhone:
+          type: string
+          format: 'maximum length: 40'
+          example: +344544445
+          description: The mobile phone at which the person or a predesignated employee of the organization referred to in the address can be called.
+        otherPhone:
+          type: string
+          format: 'maximum length: 40'
+          example: +344544444
+          description: The alternate phone number at which the person or a predesignated employee of the organization referred to in the address can be called.
+        state:
+          type: string
+          format: 'maximum length: 35'
+          example: ""
+          description: 'The state in the address. '
+        zipCode:
+          type: string
+          format: 'maximum length: 35'
+          example: CT10 1DP
+          description: The post/zip code in the address.
+        extn:
+          $ref: '#/components/schemas/personInfoShipTo_extn'
+    personInfoShipTo_extn:
+      type: object
+      properties:
+        attention:
+          type: string
+          format: 'maximum length: 69'
+          description: attention
+        careOfName:
+          type: string
+          format: 'maximum length: 69'
+          description: careOfName
+        county:
+          type: string
+          format: 'maximum length: 69'
+          description: County
+        addressLine7:
+          type: string
+          format: 'maximum length: 69'
+          description: Address line 7
+        globalCustomerId:
+          type: string
+          format: 'maximum length: 100'
+          description: globalCustomerId
+        alternativeCollectorFirstname:
+          type: string
+          format: 'maximum length: 64'
+          description: AlternativeCollectorFirstname
+        alternativeCollectorSurname:
+          type: string
+          format: 'maximum length: 64'
+          description: ' AlternativeCollectorSurname '
+    order_personInfoBillTo:
+      type: object
+      required:
+      - addressLine1
+      - city
+      - country
+      - firstName
+      - lastName
+      - zipCode
+      properties:
+        eMailID:
+          type: string
+          format: 'maximum length: 150'
+          example: abc.xyz@ingka.com
+          description: Email id
+        addressLine1:
+          type: string
+          format: 'maximum length: 70'
+          example: addressLine1
+          description: The address line 1 field.
+        addressLine2:
+          type: string
+          format: 'maximum length: 70'
+          example: addressLine2
+          description: The address line 2 field.
+        addressLine3:
+          type: string
+          format: 'maximum length: 70'
+          example: addressLine3
+          description: The address line 3 field.
+        addressLine4:
+          type: string
+          format: 'maximum length: 70'
+          example: addressLine4
+          description: The address line 4 field.
+        addressLine5:
+          type: string
+          format: 'maximum length: 70'
+          example: addressLine5
+          description: The address line 5 field.
+        addressLine6:
+          type: string
+          format: 'maximum length: 70'
+          example: addressLine6
+          description: The address line 6 field.
+        city:
+          type: string
+          format: 'maximum length: 35'
+          example: Broadstairs
+          description: The city in the address.
+        country:
+          type: string
+          format: 'maximum length: 40'
+          example: GB/SE/IE
+          description: The country in the address.
+        company:
+          type: string
+          format: 'maximum length: 100'
+          example: Company Business name
+          description: CompanyBusiness name
+        firstName:
+          type: string
+          format: 'maximum length: 64'
+          example: firstName
+          description: The first name of the person.
+        lastName:
+          type: string
+          format: 'maximum length: 64'
+          example: lastName
+          description: lastName
+        middleName:
+          type: string
+          format: 'maximum length: 40'
+          example: middleName
+          description: The middle name of the person.
+        alternameEmailID:
+          type: string
+          format: 'maximum length: 150'
+          example: alternameEmailID@gmail.com
+          description: The alternate email address at which the person or a predesignated employee of the organization referred to in the address can be contacted.
+        dayPhone:
+          type: string
+          format: 'maximum length: 40'
+          example: +344544444
+          description: The day time phone at which the person or organization referred to in the address can be called.
+        dayFaxNo:
+          type: string
+          format: 'maximum length: 40'
+          example: day Fax
+          description: The day time fax at which the person or a predesignated employee of the organization referred to in the address can be notified
+        eveningPhone:
+          type: string
+          format: 'maximum length: 40'
+          example: +344544444
+          description: The evening time phone at which the person or organization referred to in the address can be called.
+        mobilePhone:
+          type: string
+          format: 'maximum length: 40'
+          example: +344544555
+          description: The mobile phone at which the person or a predesignated employee of the organization referred to in the address can be called.
+        otherPhone:
+          type: string
+          format: 'maximum length: 40'
+          example: +344544444
+          description: The alternate phone number at which the person or a predesignated employee of the organization referred to in the address can be called.
+        state:
+          type: string
+          format: 'maximum length: 35'
+          example: State
+          description: The state in the address.
+        zipCode:
+          type: string
+          format: 'maximum length: 35'
+          example: CT10 1DP
+          description: The post/zip code in the address.
+        extn:
+          $ref: '#/components/schemas/personInfoBillTo_extn'
+    personInfoBillTo_extn:
+      type: object
+      properties:
+        attention:
+          type: string
+          format: 'maximum length: 69'
+          description: attention
+        careOfName:
+          type: string
+          format: 'maximum length: 69'
+          description: careOfName
+        county:
+          type: string
+          format: 'maximum length: 69'
+          description: County
+        addressLine7:
+          type: string
+          format: 'maximum length: 69'
+          description: Address line 7
+        globalCustomerId:
+          type: string
+          format: 'maximum length: 100'
+          example: F8D58017-4762-11ea-9C68-005056B1779F
+          description: globalCustomerId
+    order_headerCharges:
+      type: object
+      required:
+      - headerCharge
+      properties:
+        headerCharge:
+          type: array
+          items:
+            $ref: '#/components/schemas/headerCharge'
+    headerCharge:
+      type: object
+      required:
+      - chargeAmount
+      - chargeCategory
+      - chargeName
+      properties:
+        chargeAmount:
+          type: integer
+          format: 'decimal (total number of digits: 15 fraction digits: 2) '
+          example: "20.50"
+          description: The amount of the charge.
+        chargeCategory:
+          type: string
+          format: 'maximum length: 20'
+          example: Discount
+          description: The charge category. For example, Labeling or Handling.
+        chargeName:
+          type: string
+          format: 'maximum length: 20'
+          description: The charge name.
+    order_priceInfo:
+      type: object
+      required:
+      - currency
+      properties:
+        currency:
+          type: string
+          format: 'maximum length: 20'
+          example: CZK / GBP / SEK
+          description: The currency code in which this order is being processed. All price fields are assumed to be in this currency.
+    order_headerTaxes:
+      type: object
+      required:
+      - headerTax
+      properties:
+        headerTax:
+          type: array
+          items:
+            $ref: '#/components/schemas/headerTax'
+    headerTax:
+      type: object
+      required:
+      - tax
+      - taxName
+      properties:
+        taxName:
+          type: string
+          format: 'maximum length: 40'
+          example: VAT
+          description: Type of tax. The TaxName must only be passed once, even when using a combination of ChargeCategory and ChargeName.
+        tax:
+          type: integer
+          format: 'decimal(total number of digits: 15 fraction digits: 2) '
+          example: "2.50"
+          description: This is to capture Header level tax if any. Line level tax should not be added or sent in this attribute. If there is no Header tax, it can be sent as Zero or do not sent the element
+    order_fileAttachments:
+      type: object
+      properties:
+        fileAttachment:
+          type: array
+          items:
+            $ref: '#/components/schemas/fileAttachment'
+    fileAttachment:
+      type: object
+      properties:
+        fileContentType:
+          type: string
+          format: 'maximum length: 100'
+          example: VAT_REFUND / SERVICE_REPORT/ PNG/ PICTURE/ PDF/ OTHER/ MEASUREMENT/ JPG/ IHP Drawing/ DRAWING/ USTOMER_COMMUNICATION/ ASSEMBLY_INSTRUCTION
+          description: Type of the file content as returned by FileUploadServlet
+        fileDescription:
+          type: string
+          format: 'maximum length: 255'
+          description: Description of the file as returned by FileUploadServlet
+        fileName:
+          type: string
+          format: 'maximum length: 100'
+          description: Complete name of the file as returned by FileUploadServlet
+        operation:
+          type: string
+          format: 'maximum length: 100'
+          example: DELETE
+          description: Operation.
+        extn:
+          $ref: '#/components/schemas/fileAttachment_extn'
+    fileAttachment_extn:
+      type: object
+      properties:
+        locationURL:
+          type: string
+          format: 'maximum length: 300'
+          description: The URL relating to Location
+        systemSourceName:
+          type: string
+          format: 'maximum length: 20'
+          example: PAX
+          description: The source of the system for a specific file attachment.
+        servicePrimeLineNo:
+          type: integer
+          format: 'nonNegativeInteger (total number of digits: 5)'
+          example: 1
+          description: Field to store the associated service item's PrimeLineNo.
+    order_answerSets:
+      type: object
+      required:
+      - answerSet
+      properties:
+        answerSet:
+          type: array
+          items:
+            $ref: '#/components/schemas/answerSet'
+    answerSet:
+      type: object
+      required:
+      - answers
+      - questionType
+      properties:
+        questionType:
+          type: string
+          format: 'maximum length: 20'
+          description: The question type associated to the defined answer set
+        answers:
+          $ref: '#/components/schemas/answerSet_answers'
+    answerSet_answers_answer:
+      type: object
+      required:
+      - answerValue
+      - extn
+      properties:
+        answerValue:
+          type: string
+          format: 'maximum length: 1000'
+          description: AnswerValue passed should be a valid answer for the question it belongs to
+        questionID:
+          type: string
+          format: 'maximum length: 20'
+          description: Identifier for the question that this answer is for.
+        extn:
+          $ref: '#/components/schemas/answerSet_answers_answer_extn'
+    order_resolutionDetailsList:
+      type: object
+      properties:
+        resolutionDetails:
+          type: array
+          items:
+            $ref: '#/components/schemas/resolutionDetails'
+    resolutionDetails:
+      type: object
+      properties:
+        inbox:
+          $ref: '#/components/schemas/resolutionDetails_inbox'
+    order_shipments:
+      type: object
+      properties:
+        shipment:
+          type: array
+          items:
+            $ref: '#/components/schemas/shipment'
+    shipment:
+      type: object
+      properties:
+        extn:
+          $ref: '#/components/schemas/shipment_extn'
+    modifyOrderResponse:
+      type: object
+      properties:
+        responseMessage:
+          type: string
+          example: SuccessfullyProcessed.
+          description: it will givive you the response message like SuccessfullyProcessed/InvalidRequest.
+        responseCode:
+          type: string
+          example: "200"
+          description: it will givive you the response code 200 or 400
+    modifyOrderErrorResponse:
+      type: object
+      properties:
+        responseMessage:
+          type: string
+          example: InvalidRequest
+          description: It will show the success or failure message
+        responseCode:
+          type: string
+          example: "400"
+          description: It will give you the  code as 200 for success and 400 for the invalid request
+        error:
+          $ref: '#/components/schemas/modifyOrderErrorResponse_error'
+    modifyOrderRequest_order:
+      type: object
+      required:
+      - action
+      - answerSets
+      - countryCode
+      - customerContactID
+      - customerEMailID
+      - extn
+      - fileAttachments
+      - headerCharges
+      - headerTaxes
+      - orderLineRelationships
+      - orderLines
+      - orderNo
+      - paymentMethods
+      - personInfoBillTo
+      - personInfoShipTo
+      - priceInfo
+      - resolutionDetailsList
+      - shipments
+      properties:
+        countryCode:
+          type: string
+          format: maximum length:5
+          example: GB
+          description: Country Code to identify to which country the order belongs to.
+        customerContactID:
+          type: string
+          format: 'maximum length: 40'
+          example: customerContactID
+          description: This is the customer contact ID of the order.
+        customerEMailID:
+          type: string
+          format: 'maximum length: 150'
+          example: saumya.dash@ingka.com
+          description: The E-mail ID of the customer.
+        orderNo:
+          type: string
+          format: 'maximum length: 40'
+          example: "1091799904"
+          description: Number of the isom order
+        action:
+          type: string
+          format: 'maximum length: 40'
+          example: MODIFY/CANCEL
+          description: Type of action performed on the order.
+        extn:
+          $ref: '#/components/schemas/order_extn'
+        orderLines:
+          $ref: '#/components/schemas/order_orderLines'
+        orderLineRelationships:
+          $ref: '#/components/schemas/order_orderLineRelationships'
+        paymentMethods:
+          $ref: '#/components/schemas/order_paymentMethods'
+        personInfoShipTo:
+          $ref: '#/components/schemas/order_personInfoShipTo'
+        personInfoBillTo:
+          $ref: '#/components/schemas/order_personInfoBillTo'
+        headerCharges:
+          $ref: '#/components/schemas/order_headerCharges'
+        priceInfo:
+          $ref: '#/components/schemas/order_priceInfo'
+        headerTaxes:
+          $ref: '#/components/schemas/order_headerTaxes'
+        fileAttachments:
+          $ref: '#/components/schemas/order_fileAttachments'
+        answerSets:
+          $ref: '#/components/schemas/order_answerSets'
+        resolutionDetailsList:
+          $ref: '#/components/schemas/order_resolutionDetailsList'
+        shipments:
+          $ref: '#/components/schemas/order_shipments'
+    orderLine_item:
+      type: object
+      required:
+      - itemDesc
+      - itemID
+      - unitOfMeasure
+      properties:
+        itemID:
+          type: string
+          format: 'maximum length: 40'
+          example: ART20350182, SGR40400001
+          description: The identifier for the item.
+        unitOfMeasure:
+          type: string
+          format: 'maximum length: 40'
+          example: Meter/ Piece/ ORDERS/ PAT_VALUE
+          description: the unitOfMeasure applicable for the Item
+        itemDesc:
+          type: string
+          format: 'maximum length: 40'
+          description: The description of the item.
+    orderLine_linePriceInfo:
+      type: object
+      required:
+      - retailPrice
+      - unitPrice
+      properties:
+        retailPrice:
+          type: integer
+          format: 'decimal (minimum value: 0 total number of digits: 19 fraction digits: 6)'
+          description: The unit price for the order line - TAX inclusive.
+        unitPrice:
+          type: integer
+          format: 'decimal (minimum value: 0 total number of digits: 15 fraction digits: 2)'
+          description: The unit price for the order line - TAX exclusive.
+    orderLine_references:
+      type: object
+      required:
+      - mergeDeliveryNo
+      - mergeOrderNo
+      properties:
+        mergeOrderNo:
+          type: string
+          format: 'maximum length: 40'
+          example: "1091424950"
+          description: This is order number of the regular sales order to which transport desk order in getting merged This is an optional field and will be passed only in 1.3.1 order merge.
+        mergeDeliveryNo:
+          type: string
+          format: 'maximum length: 254'
+          example: "1"
+          description: Prime line number of the delivery(DS line) which is getting merged with Transport desk delivery This is an optional field and will be passed only in 1.3.1 order merge
+    orderLineRelationship_parentLine:
+      type: object
+      required:
+      - primeLineNo
+      properties:
+        primeLineNo:
+          type: integer
+          format: 'nonNegativeInteger (total number of digits: 5)'
+          example: 1
+    orderLineRelationship_childLine:
+      type: object
+      required:
+      - primeLineNo
+      properties:
+        primeLineNo:
+          type: integer
+          format: 'nonNegativeInteger (total number of digits: 5)'
+          example: 3
+    answerSet_answers:
+      type: object
+      required:
+      - answer
+      properties:
+        answer:
+          type: array
+          items:
+            $ref: '#/components/schemas/answerSet_answers_answer'
+    answerSet_answers_answer_extn:
+      type: object
+      required:
+      - questionRef
+      - servicePrimeLineNo
+      properties:
+        questionRef:
+          type: string
+          format: 'maximum length: 40'
+          description: The attribute will use to hold question reference
+        option:
+          type: string
+          format: 'maximum length: 40'
+          description: Option
+        servicePrimeLineNo:
+          type: integer
+          format: 'nonNegativeInteger (total number of digits: 5)'
+          description: Associated service Prime Line No of the this answerset
+    resolutionDetails_inbox:
+      type: object
+      required:
+      - inboxKey
+      properties:
+        inboxKey:
+          type: string
+          format: 'maximum length: 24'
+          description: Primary key of the deviation.
+    shipment_extn:
+      type: object
+      properties:
+        workOrderNo:
+          type: string
+          format: 'maximum length: 40'
+          example: "4201022"
+          description: Number of the work order associated to the order.
+        cduID:
+          type: string
+          format: 'maximum length: 50'
+          example: "3565656"
+          description: CDU ID.
+        action:
+          type: string
+          format: 'maximum length: 50'
+          example: CANCEL
+          description: action on shipment
+    modifyOrderErrorResponse_error:
+      type: object
+      properties:
+        errorUniqueExceptionId:
+          type: string
+          example: 172.19.203.3815707054935370000000000001
+          description: Unique error exception Id which will contain IP address ,timestamp details
+        errorDescription:
+          type: string
+          example: Please send valid Service type
+          description: error description of an exception
+        errorCode:
+          type: string
+          example: EXTN_SOMCO_0011
+          description: error code of an exception
+      description: represents exception to successful response of crete order rest api
   securitySchemes:
     bearerAuth:
       type: http
