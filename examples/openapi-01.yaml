@@ -21,6 +21,7 @@ servers:
 paths:
   /{region}/modify-order:
     post:
+      summary: modify order for the Order
       tags:
       - Modify Order Service
       operationId: IKEAModifyOrderSync
@@ -28,32 +29,34 @@ paths:
       - name: region
         in: path
         required: true
-        type: string
       - name: Authorization
         in: header
         required: true
-        type: string
       - in: body
         name: Modify Order Service
         description: Request to modify order
         required: true
         schema:
-          $ref: '#/definitions/modifyOrderRequest'
+          $ref: '#/components/schemas/modifyOrderRequest'
       responses:
         "200":
           description: Successfully processed.
-          schema:
-            $ref: '#/definitions/modifyOrderResponse'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/modifyOrderResponse'
         "400":
           description: Failed processing
-          schema:
-            $ref: '#/definitions/modifyOrderErrorResponse'
-definitions:
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/modifyOrderErrorResponse'
+components/schemas:
   modifyOrderRequest:
     type: object
     properties:
       order:
-        $ref: '#/definitions/modifyOrderRequest_order'
+        $ref: '#/components/schemas/modifyOrderRequest_order'
   order_extn:
     type: object
     required:
@@ -132,7 +135,7 @@ definitions:
       orderLine:
         type: array
         items:
-          $ref: '#/definitions/orderLine'
+          $ref: '#/components/schemas/orderLine'
   orderLine:
     type: object
     required:
@@ -222,21 +225,21 @@ definitions:
         example: 3700.01.100
         description: Maximum order line status among all records that belong to an order.
       item:
-        $ref: '#/definitions/orderLine_item'
+        $ref: '#/components/schemas/orderLine_item'
       linePriceInfo:
-        $ref: '#/definitions/orderLine_linePriceInfo'
+        $ref: '#/components/schemas/orderLine_linePriceInfo'
       references:
-        $ref: '#/definitions/orderLine_references'
+        $ref: '#/components/schemas/orderLine_references'
       lineTaxes:
-        $ref: '#/definitions/orderLine_lineTaxes'
+        $ref: '#/components/schemas/orderLine_lineTaxes'
       orderHoldTypes:
-        $ref: '#/definitions/orderLine_orderHoldTypes'
+        $ref: '#/components/schemas/orderLine_orderHoldTypes'
       workOrderAppointments:
-        $ref: '#/definitions/orderLine_workOrderAppointments'
+        $ref: '#/components/schemas/orderLine_workOrderAppointments'
       extn:
-        $ref: '#/definitions/orderLine_extn'
+        $ref: '#/components/schemas/orderLine_extn'
       additionalAddresses:
-        $ref: '#/definitions/orderLine_additionalAddresses'
+        $ref: '#/components/schemas/orderLine_additionalAddresses'
     description: Contains orderline information.
   orderLine_lineTaxes:
     type: object
@@ -246,7 +249,7 @@ definitions:
       lineTax:
         type: array
         items:
-          $ref: '#/definitions/lineTax'
+          $ref: '#/components/schemas/lineTax'
   lineTax:
     type: object
     required:
@@ -277,7 +280,7 @@ definitions:
       orderHoldType:
         type: array
         items:
-          $ref: '#/definitions/orderHoldType'
+          $ref: '#/components/schemas/orderHoldType'
   orderHoldType:
     type: object
     required:
@@ -302,7 +305,7 @@ definitions:
       workOrderAppointment:
         type: array
         items:
-          $ref: '#/definitions/workOrderAppointment'
+          $ref: '#/components/schemas/workOrderAppointment'
   workOrderAppointment:
     type: object
     required:
@@ -472,7 +475,7 @@ definitions:
         example: ID_CHECK_REQUIRED
         description: any additional information pass to external systems
       capabilityList:
-        $ref: '#/definitions/orderLine_extn_capabilityList'
+        $ref: '#/components/schemas/orderLine_extn_capabilityList'
   orderLine_extn_capabilityList:
     type: object
     required:
@@ -481,7 +484,7 @@ definitions:
       capability:
         type: array
         items:
-          $ref: '#/definitions/capability'
+          $ref: '#/components/schemas/capability'
   capability:
     type: object
     required:
@@ -500,7 +503,7 @@ definitions:
       additionalAddress:
         type: array
         items:
-          $ref: '#/definitions/additionalAddress'
+          $ref: '#/components/schemas/additionalAddress'
   additionalAddress:
     type: object
     required:
@@ -512,7 +515,7 @@ definitions:
         format: 'maximum length: 40'
         description: Identifies the type of address
       personInfo:
-        $ref: '#/definitions/additionalAddress_personInfo'
+        $ref: '#/components/schemas/additionalAddress_personInfo'
   additionalAddress_personInfo:
     type: object
     required:
@@ -579,7 +582,7 @@ definitions:
         example: lastName
         description: PuP name
       extn:
-        $ref: '#/definitions/personInfo_extn'
+        $ref: '#/components/schemas/personInfo_extn'
   personInfo_extn:
     type: object
     required:
@@ -627,7 +630,7 @@ definitions:
       orderLineRelationship:
         type: array
         items:
-          $ref: '#/definitions/orderLineRelationship'
+          $ref: '#/components/schemas/orderLineRelationship'
   orderLineRelationship:
     type: object
     required:
@@ -645,9 +648,9 @@ definitions:
         format: 'maximum length: 40'
         example: DELIVERY / SERVICE
       parentLine:
-        $ref: '#/definitions/orderLineRelationship_parentLine'
+        $ref: '#/components/schemas/orderLineRelationship_parentLine'
       childLine:
-        $ref: '#/definitions/orderLineRelationship_childLine'
+        $ref: '#/components/schemas/orderLineRelationship_childLine'
   order_paymentMethods:
     type: object
     required:
@@ -656,7 +659,7 @@ definitions:
       paymentMethod:
         type: array
         items:
-          $ref: '#/definitions/paymentMethod'
+          $ref: '#/components/schemas/paymentMethod'
   paymentMethod:
     type: object
     required:
@@ -809,7 +812,7 @@ definitions:
         example: CT10 1DP
         description: The post/zip code in the address.
       extn:
-        $ref: '#/definitions/personInfoShipTo_extn'
+        $ref: '#/components/schemas/personInfoShipTo_extn'
   personInfoShipTo_extn:
     type: object
     properties:
@@ -957,7 +960,7 @@ definitions:
         example: CT10 1DP
         description: The post/zip code in the address.
       extn:
-        $ref: '#/definitions/personInfoBillTo_extn'
+        $ref: '#/components/schemas/personInfoBillTo_extn'
   personInfoBillTo_extn:
     type: object
     properties:
@@ -990,7 +993,7 @@ definitions:
       headerCharge:
         type: array
         items:
-          $ref: '#/definitions/headerCharge'
+          $ref: '#/components/schemas/headerCharge'
   headerCharge:
     type: object
     required:
@@ -1030,7 +1033,7 @@ definitions:
       headerTax:
         type: array
         items:
-          $ref: '#/definitions/headerTax'
+          $ref: '#/components/schemas/headerTax'
   headerTax:
     type: object
     required:
@@ -1053,7 +1056,7 @@ definitions:
       fileAttachment:
         type: array
         items:
-          $ref: '#/definitions/fileAttachment'
+          $ref: '#/components/schemas/fileAttachment'
   fileAttachment:
     type: object
     properties:
@@ -1076,7 +1079,7 @@ definitions:
         example: DELETE
         description: Operation.
       extn:
-        $ref: '#/definitions/fileAttachment_extn'
+        $ref: '#/components/schemas/fileAttachment_extn'
   fileAttachment_extn:
     type: object
     properties:
@@ -1102,7 +1105,7 @@ definitions:
       answerSet:
         type: array
         items:
-          $ref: '#/definitions/answerSet'
+          $ref: '#/components/schemas/answerSet'
   answerSet:
     type: object
     required:
@@ -1114,7 +1117,7 @@ definitions:
         format: 'maximum length: 20'
         description: The question type associated to the defined answer set
       answers:
-        $ref: '#/definitions/answerSet_answers'
+        $ref: '#/components/schemas/answerSet_answers'
   answerSet_answers_answer:
     type: object
     required:
@@ -1130,31 +1133,31 @@ definitions:
         format: 'maximum length: 20'
         description: Identifier for the question that this answer is for.
       extn:
-        $ref: '#/definitions/answerSet_answers_answer_extn'
+        $ref: '#/components/schemas/answerSet_answers_answer_extn'
   order_resolutionDetailsList:
     type: object
     properties:
       resolutionDetails:
         type: array
         items:
-          $ref: '#/definitions/resolutionDetails'
+          $ref: '#/components/schemas/resolutionDetails'
   resolutionDetails:
     type: object
     properties:
       inbox:
-        $ref: '#/definitions/resolutionDetails_inbox'
+        $ref: '#/components/schemas/resolutionDetails_inbox'
   order_shipments:
     type: object
     properties:
       shipment:
         type: array
         items:
-          $ref: '#/definitions/shipment'
+          $ref: '#/components/schemas/shipment'
   shipment:
     type: object
     properties:
       extn:
-        $ref: '#/definitions/shipment_extn'
+        $ref: '#/components/schemas/shipment_extn'
   modifyOrderResponse:
     type: object
     properties:
@@ -1178,7 +1181,7 @@ definitions:
         example: "400"
         description: It will give you the  code as 200 for success and 400 for the invalid request
       error:
-        $ref: '#/definitions/modifyOrderErrorResponse_error'
+        $ref: '#/components/schemas/modifyOrderErrorResponse_error'
   modifyOrderRequest_order:
     type: object
     required:
@@ -1227,31 +1230,31 @@ definitions:
         example: MODIFY/CANCEL
         description: Type of action performed on the order.
       extn:
-        $ref: '#/definitions/order_extn'
+        $ref: '#/components/schemas/order_extn'
       orderLines:
-        $ref: '#/definitions/order_orderLines'
+        $ref: '#/components/schemas/order_orderLines'
       orderLineRelationships:
-        $ref: '#/definitions/order_orderLineRelationships'
+        $ref: '#/components/schemas/order_orderLineRelationships'
       paymentMethods:
-        $ref: '#/definitions/order_paymentMethods'
+        $ref: '#/components/schemas/order_paymentMethods'
       personInfoShipTo:
-        $ref: '#/definitions/order_personInfoShipTo'
+        $ref: '#/components/schemas/order_personInfoShipTo'
       personInfoBillTo:
-        $ref: '#/definitions/order_personInfoBillTo'
+        $ref: '#/components/schemas/order_personInfoBillTo'
       headerCharges:
-        $ref: '#/definitions/order_headerCharges'
+        $ref: '#/components/schemas/order_headerCharges'
       priceInfo:
-        $ref: '#/definitions/order_priceInfo'
+        $ref: '#/components/schemas/order_priceInfo'
       headerTaxes:
-        $ref: '#/definitions/order_headerTaxes'
+        $ref: '#/components/schemas/order_headerTaxes'
       fileAttachments:
-        $ref: '#/definitions/order_fileAttachments'
+        $ref: '#/components/schemas/order_fileAttachments'
       answerSets:
-        $ref: '#/definitions/order_answerSets'
+        $ref: '#/components/schemas/order_answerSets'
       resolutionDetailsList:
-        $ref: '#/definitions/order_resolutionDetailsList'
+        $ref: '#/components/schemas/order_resolutionDetailsList'
       shipments:
-        $ref: '#/definitions/order_shipments'
+        $ref: '#/components/schemas/order_shipments'
   orderLine_item:
     type: object
     required:
@@ -1329,7 +1332,7 @@ definitions:
       answer:
         type: array
         items:
-          $ref: '#/definitions/answerSet_answers_answer'
+          $ref: '#/components/schemas/answerSet_answers_answer'
   answerSet_answers_answer_extn:
     type: object
     required:
