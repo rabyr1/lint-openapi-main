@@ -30,15 +30,18 @@ paths:
       - name: region
         in: path
         required: true
+        schema:
+            type: string
       - name: Authorization
         in: header
         required: true
-      - in: body
-        name: Modify Order Service
-        description: Request to modify order
-        required: true
         schema:
-          $ref: '#/components/schemas/modifyOrderRequest'
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/modifyOrderRequest'
       responses:
         "200":
           description: Successfully processed.
