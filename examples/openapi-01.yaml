@@ -4,8 +4,8 @@ info:
   version: 1.0.6
   title: iSOM Modify Order API
   contact:
-	name: Order-Conception-Team
     email: dl.fulfillment.scrum.team.order_conception.se@ingka.com
+    name: Order-Conception-Team
   x-ibm-name: IKEAModifyOrderSync
   license:
     name: INGKA GROUP INNER SOURCE LICENCE VERSION 1.0
